@@ -1,0 +1,26 @@
+# Infrastructure as Code and Configuration Files
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+docker-compose.yml linguist-language=Docker
+docker-compose.yaml linguist-language=Docker
+
+# Scripts and Programming Files
+*.sh linguist-language=Shell
+*.py linguist-language=Python
+
+# Web Files
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+
+# Service and Configuration Files
+*.service linguist-language=INI
+Caddyfile linguist-language=Caddyfile
+prometheus.yml linguist-language=YAML
+
+# Documentation (optional - usually excluded from stats)
+*.md linguist-documentation=true
+
+# Ensure certain files are detected as code, not data
+*.yml linguist-detectable=true
+*.yaml linguist-detectable=true
+*.sh linguist-detectable=true
