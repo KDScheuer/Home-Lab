@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Lab Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-server"></i> Home Dashboard</h1>
+        </header>
+        
+        <main>
+            <!-- Applications Section -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-cube"></i> Applications</h2>
+                <div class="apps-grid">
+                    
+                    <div class="app-tile" onclick="openApp('https://vaultwarden.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <span class="app-name">Vaultwarden</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://immich.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <span class="app-name">Immich</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://jellyfin.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <span class="app-name">Jellyfin</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://mealie.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <span class="app-name">Mealie</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://filebrowser.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <span class="app-name">File Browser</span>
+                    </div>
+
+                </div>
+            </section>
+            
+            <!-- Monitoring Section -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-chart-area"></i> Monitoring</h2>
+                <div class="apps-grid">
+                    <div class="app-tile" onclick="openApp('https://adguard.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span class="app-name">AdGuard Home</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://grafana.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span class="app-name">Grafana</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://prometheus.kds-dev.com')">
+                        <div class="app-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="app-name">Prometheus</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('http://192.168.50.1')">
+                        <div class="app-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <span class="app-name">Router</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- External Sites Section -->
+            <section class="section">
+                <h2 class="section-title"><i class="fas fa-external-link-alt"></i> External Sites</h2>
+                <div class="apps-grid">
+                    <div class="app-tile" onclick="openApp('https://us-east-2.signin.aws.amazon.com/')">
+                        <div class="app-icon">
+                            <i class="fab fa-aws"></i>
+                        </div>
+                        <span class="app-name">AWS</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://mylogin.freedommortgage.com/')">
+                        <div class="app-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <span class="app-name">Mortgage</span>
+                    </div>
+                    
+                    <div class="app-tile" onclick="openApp('https://myaccount.momnt.com/login')">
+                        <div class="app-icon">
+                            <i class="fas fa-window-restore"></i>
+                        </div>
+                        <span class="app-name">Window Loan</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+    </div>
+    
+    <script>
+        function openApp(url) {
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

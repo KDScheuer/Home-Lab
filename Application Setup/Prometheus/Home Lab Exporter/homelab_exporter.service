@@ -1,0 +1,32 @@
+[Unit]
+Description=Home Lab Prometheus Exporter
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=homelab_exporter
+Group=homelab_exporter
+WorkingDirectory=/opt/homelab_exporter
+ExecStart=/usr/bin/python3 /opt/homelab_exporter/homelab_exporter.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=homelab_exporter
+
+# Security settings
+NoNewPrivileges=false
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log
+
+# Network settings
+PrivateNetwork=false
+
+# Allow access to Docker socket if needed
+SupplementaryGroups=docker
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,65 @@
+{
+    # This email is required by Caddy for certificate management
+    email kdscheuer97@gmail.com
+}
+
+(home_tls) {
+    tls /srv/certs/home.kds-dev.com/fullchain.pem /srv/certs/home.kds-dev.com/privkey.pem
+}
+adguard.kds-dev.com {
+    import home_tls
+    reverse_proxy adguardhome:80
+}
+immich.kds-dev.com {
+    import home_tls
+    reverse_proxy immich-server:2283 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+mealie.kds-dev.com {
+    import home_tls
+    reverse_proxy mealie:9000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+jellyfin.kds-dev.com {
+    import home_tls
+
+    # Allowed IPs (LAN)
+    @allowed remote_ip 192.168.50.0/24
+
+    handle @allowed {
+        reverse_proxy jellyfin:8096
+    }
+
+    # Everything else blocked
+    handle {
+        respond "Forbidden" 403
+    }
+}
+home.kds-dev.com {
+    import home_tls
+    reverse_proxy homepage:80
+}
+vaultwarden.kds-dev.com {
+    import home_tls
+    reverse_proxy vaultwarden:80
+}
+filebrowser.kds-dev.com {
+    import home_tls
+    reverse_proxy filebrowser:80
+}
+prometheus.kds-dev.com {
+    import home_tls
+    reverse_proxy prometheus:9090
+}
+grafana.kds-dev.com {
+    import home_tls
+    reverse_proxy grafana:3000
+}

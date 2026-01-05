@@ -1,0 +1,19 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - /srv/vaultwarden/data:/data
+    environment:
+      TZ: America/Boise
+      WEBSOCKET_ENABLED: "true"
+      SIGNUPS_ALLOWED: "false"
+      DOMAIN: "https://vaultwarden.kds-dev.com"
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

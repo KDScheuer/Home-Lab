@@ -1,0 +1,17 @@
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    volumes:
+      - /srv/filebrowser/srv:/srv
+      - /srv/filebrowser/database:/database
+      - /srv/filebrowser/config:/config
+    environment:
+      - TZ=America/Denver
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

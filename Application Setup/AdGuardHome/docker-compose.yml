@@ -1,0 +1,20 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+    environment:
+      TZ: America/Denver
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "853:853/tcp"
+      - "853:853/udp"
+    volumes:
+      - /srv/adguardhome/work:/opt/adguardhome/work
+      - /srv/adguardhome/conf:/opt/adguardhome/conf
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
