@@ -1,6 +1,6 @@
 # Installing AdGuard Home
 
-![AdGuard Home](/Assets/adguardhome.png)
+![AdGuard Home](/Assets/AdGuardHome.png)
 
 ### Create Directories for Persistent Data
 ```bash

@@ -1,6 +1,6 @@
 # Installing Prometheus
 
-![Prometheus](/Assets/prometheus.png)
+![Prometheus](/Assets/Prometheus.png)
 
 ### Create Directories for Persistent Data
 ```bash

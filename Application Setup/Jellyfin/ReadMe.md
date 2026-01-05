@@ -1,6 +1,6 @@
 # Installing Jellyfin
 
-![Jellyfin](/Assets/jellyfin.png)
+![Jellyfin](/Assets/Jellyfin.png)
 
 ### Create Directories for Persistent Data
 ```bash

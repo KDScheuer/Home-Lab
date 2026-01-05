@@ -1,6 +1,6 @@
 # Installing Tailscale
 
-![Tailscale](/Assets/tailscale.png)
+![Tailscale](/Assets/Tailscale.png)
 
 ### Installing Tailscale on the server
 ```bash

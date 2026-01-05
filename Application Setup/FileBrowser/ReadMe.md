@@ -1,6 +1,6 @@
 # Installing FileBrowser
 
-![FileBrowser](/Assets/filebrowser.png)
+![FileBrowser](/Assets/Filebrowser.png)
 
 ### Create Directories for Persistent Data
 ```bash

@@ -1,6 +1,6 @@
 # Installing VaultWarden
 
-![VaultWarden](/Assets/vaultwarden.png)
+![VaultWarden](/Assets/Vaultwarden.png)
 
 ### Create Directories for Persistent Data
 ```bash

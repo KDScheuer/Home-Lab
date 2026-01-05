@@ -1,6 +1,6 @@
 # Installing Mealie
 
-![Mealie](/Assets/mealie.png)
+![Mealie](/Assets/Mealie.png)
 
 ### Creating Dirs for persistent data
 ```bash

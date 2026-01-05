@@ -1,6 +1,6 @@
 # Installing Immich
 
-![Immich](/Assets/immich.png)
+![Immich](/Assets/Immich.png)
 
 ### Creating Persistent Directories for Database, Cache, etc.
 ```bash

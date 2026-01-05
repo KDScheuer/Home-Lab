@@ -1,6 +1,6 @@
 # Installing Grafana
 
-![Grafana](/Assets/grafana.png)
+![Grafana](/Assets/Grafana.png)
 
 ### Create Directories for Persistent Data
 ```bash
