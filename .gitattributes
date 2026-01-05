@@ -1,8 +1,8 @@
 # Infrastructure as Code and Configuration Files
 *.yml linguist-language=YAML
 *.yaml linguist-language=YAML
-docker-compose.yml linguist-language=Docker
-docker-compose.yaml linguist-language=Docker
+docker-compose.yml linguist-language=YAML
+docker-compose.yaml linguist-language=YAML
 
 # Scripts and Programming Files
 *.sh linguist-language=Shell
