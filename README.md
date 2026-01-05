@@ -1,5 +1,5 @@
 
-# Enterprise Home Lab Infrastructure
+# Home Lab Infrastructure
 *Production-grade containerized services with monitoring, security, and disaster recovery*
 
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)](https://docker.com)
