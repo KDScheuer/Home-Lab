@@ -164,3 +164,68 @@ sudo chown kscheuer:kscheuer \
     /srv/certs/home.kds-dev.com/privkey.pem \
     /srv/certs/home.kds-dev.com/README
 ```
+
+## SSH Setup
+### Generating Keypair
+```bash
+ssh-keygen -t ed25519 -C "kdscheuer97@gmail.com"
+# Saving as: /home/kscheuer/.ssh/homelab
+```
+### Creating Authorized Key File
+```bash
+cd ~/.ssh
+chmod 700 ~/.ssh
+cat homelab.pub >> authorized_keys
+chmod 600 authorized_keys
+chown -R kscheuer:kscheuer ~/.ssh
+```
+
+### Allowing Public Key Authentication
+```bash
+vi /etc/ssh/sshd_config
+```
+```bash
+PubkeyAuthentication yes
+```
+
+### Verify There are no SELinux issues
+```bash
+restorecon -R -v ~/.ssh
+```
+
+### Testing SSH Using Public key
+```bash
+ssh -i homelab kscheuer@192.168.50.200
+```
+
+### Adding SSH Config on Client for Easy SSH Access
+```sh
+notepad $HOME\.ssh\config
+```
+```sh
+Host homelab
+    HostName 192.168.50.200
+    User kscheuer
+    IdentityFile C:\Users\kdsch\homelab
+```
+
+### Testing Access with new config
+```bash
+ssh homelab
+```
+
+### Removing Password Auth from SSH Access
+```bash
+vi /etc/ssh/sshd_config
+```
+```bash
+PasswordAuthentication no
+```
+```bash
+sudo systemctl reload sshd
+```
+
+### Testing Password SSH no longer works
+```sh
+ssh kscheuer@192.168.50.200
+```
