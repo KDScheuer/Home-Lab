@@ -163,10 +163,14 @@ networks:
 
 ## 💾 Disaster Recovery
 
-### 3-2-1 Backup Strategy
+### 3-2-1-1-0 Backup Strategy
 - **3 Copies:** Production, local backup, offsite backup
-- **2 Media Types:** Internal SSD, external SSD
-- **1 Offsite Location:** Fireproof /Waterproof / 800+ pound bolted down safe (physical security)
+- **2 Media Types:** Internal SSD, AWS S3
+- **1 Offsite Location:** AWS S3 (Quarterly)
+- **1 Air-Gapped Backup** SSD Stored in Fireproof/Waterproof/800+ pound bolted down safe (physical security)
+- **0 Errors** Periodic restore testing for each service in place
+
+Local Backups occur Nightly or Weekly depending on the workload being targeted. Files are periodically moved onto an external SSD for the offline ransomware proof copy, as well as into AWS S3 for an offsite immutable copy. 
 
 ### Automated Backup Process
 ```bash
@@ -178,11 +182,6 @@ networks:
 5. Retention policy enforcement
 6. Comprehensive logging to syslog
 ```
-
-### Recovery Capabilities
-- **RTO (Recovery Time Objective):** < 30 minutes for critical services
-- **RPO (Recovery Point Objective):** 24 hours for critical data, 7 days for non-critical
-
 ---
 
 ## 🎯 Skills Demonstrated
