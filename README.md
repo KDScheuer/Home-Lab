@@ -1,6 +1,6 @@
 
 # Home Lab Infrastructure
-*Production-grade containerized services with monitoring, security, and disaster recovery*
+*Containerized services with monitoring, security, and disaster recovery*
 
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)](https://docker.com)
 [![Monitoring](https://img.shields.io/badge/Monitoring-Prometheus%2BGrafana-E6522C?style=flat-square&logo=prometheus)](https://prometheus.io)
@@ -20,7 +20,7 @@
 
 ## 🏠 Overview
 
-A production-ready home lab infrastructure built to demonstrate enterprise-level practices, container orchestration, and system administration skills. This project showcases the design and implementation of a secure, monitored, and highly available service ecosystem using industry-standard tools and methodologies.
+This is my home lab infrastructure running containerized services for media streaming, photo management, password storage, and more. I've focused on security, monitoring, and automated backups to create a reliable self-hosted environment that I actually use daily.
 
 **The Why / Problems Solved:** 
 I wanted a way to better control what is being displayed to my kids, dns level blocking, and custom content streaming services allowed me to accomplish this. I also wanted a way to remove vendor lockin for cloud based services for photos, videos, documents, passwords, and secrets.
