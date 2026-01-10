@@ -23,7 +23,7 @@
 This is my home lab infrastructure running containerized services for media streaming, photo management, password storage, and more. I've focused on security, monitoring, and automated backups to create a reliable self-hosted environment that I actually use daily.
 
 **The Why / Problems Solved:** 
-I wanted a way to better control what is being displayed to my kids, dns level blocking, and custom content streaming services allowed me to accomplish this. I also wanted a way to remove vendor lockin for cloud based services for photos, videos, documents, passwords, and secrets.
+I wanted a way to better control what is being displayed to my kids, dns level ad blocking, and custom content streaming services. I also wanted to remove vendor lockin for cloud based services for photos, videos, documents, passwords, and secrets.
 
 ## 🏗️ Architecture
 ![Network Architecture](/Assets/Network%20Diagram.png)
