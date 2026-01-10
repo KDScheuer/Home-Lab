@@ -158,6 +158,7 @@ networks:
 ### Security Implementations
 - **Certificate Management:** Automated Let's Encrypt certificates via DNS-01 challenge
 - **Access Control:** Tailscale-based zero-trust network access
+- **SSH Hardening:** Key-based authentication only, password login disabled
 - **Container Isolation:** Services communicate via internal Docker networks only
 - **DNS Security:** Network-wide malware and ad blocking via AdGuard Home
 
