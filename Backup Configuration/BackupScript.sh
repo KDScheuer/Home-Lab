@@ -79,10 +79,18 @@ DURATION=$((END_TIME - START_TIME))
 BACKUP_SIZE=$(du -h "$DEST/${APP}-${DATE}.tar.gz" | cut -f1)
 log_message "Backup completed: ${APP}-${DATE}.tar.gz ($BACKUP_SIZE) in ${DURATION}s"
 
-# Restart service
+# Restart service immediately to minimize downtime
 log_message "Starting $APP..."
 docker compose start
 log_message "$APP started successfully"
+
+# Copy backup to alternate location and cleanup (service now running)
+SECONDARY_DEST="/home/kscheuer/backups/$APP"
+mkdir -p "$SECONDARY_DEST"
+log_message "Copying backup to secondary location: $SECONDARY_DEST"
+cp "$DEST/${APP}-${DATE}.tar.gz" "$SECONDARY_DEST/"
+log_message "Secondary copy completed"
+
 
 # Cleanup old backups (date-based via mtime)
 log_message "Cleaning up backups older than $RETENTION_DAYS days..."
@@ -94,6 +102,17 @@ if [[ -n "$OLD_BACKUPS" ]]; then
   log_message "Old backups removed"
 else
   log_message "No old backups to remove"
+fi
+
+# Cleanup old backups in secondary location
+log_message "Cleaning up secondary location backups older than $RETENTION_DAYS days..."
+OLD_SECONDARY_BACKUPS=$(find "$SECONDARY_DEST" -type f -name "${APP}-*.tar.gz" -mtime +"$RETENTION_DAYS" -print)
+if [[ -n "$OLD_SECONDARY_BACKUPS" ]]; then
+  log_message "Removing old secondary backups: $OLD_SECONDARY_BACKUPS"
+  find "$SECONDARY_DEST" -type f -name "${APP}-*.tar.gz" -mtime +"$RETENTION_DAYS" -delete
+  log_message "Old secondary backups removed"
+else
+  log_message "No old secondary backups to remove"
 fi
 
 # Final status

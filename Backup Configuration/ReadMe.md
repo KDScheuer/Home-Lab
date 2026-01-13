@@ -3,42 +3,39 @@
 ## Service Categorization
 
 ### Daily Backups
-**Critical services requiring daily protection due to high data sensitivity and change frequency.**
+**All services are backed up daily with automated retention policies.**
 
 - **VaultWarden**
-  - Rationale: Secrets being lost is unacceptable
-  - Retention: 14 days
+  - Rationale: Secrets being lost is unacceptable - requires daily backup protection
+  - Retention: 7 days
 
 - **FileBrowser**
   - Rationale: Important documents that could be uploaded and deleted - data loss is unacceptable
-  - Retention: 14 days
-
-### Weekly Backups
-**Services with moderate criticality where weekly backups provide sufficient data protection.**
-
-- **Immich**
-  - Rationale: Used by family to offload pictures when storage runs out. Since oldest pictures are deleted first and syncing happens automatically, weekly backups reduce risk to acceptable levels
   - Retention: 7 days
 
+- **Immich**
+  - Rationale: Used by family to offload pictures when storage runs out. Large application size requires reduced retention due to storage capacity limitations
+  - Retention: 1 day
+
 - **Mealie**
-  - Rationale: Small application storing recipes and meal plans. Data loss would be inconvenient, and due to small size and minimal impact on backup capacity, weekly backups are justified. Will be reassessed if data grows significantly
-  - Retention: 14 days
+  - Rationale: Recipe and meal planning data - daily backups ensure minimal data loss
+  - Retention: 7 days
 
 - **AdGuardHome**
-  - Rationale: Primarily configuration backups rather than data. Weekly schedule is sufficient for configuration preservation
-  - Retention: 14 days
+  - Rationale: DNS configuration and filtering rules - daily backup preserves custom configurations
+  - Retention: 7 days
 
 - **Caddy**
-  - Rationale: Primarily configuration backups rather than data. Weekly schedule is sufficient for configuration preservation
-  - Retention: 14 days
+  - Rationale: Reverse proxy configuration and certificates - daily backup ensures service continuity
+  - Retention: 7 days
 
 - **Grafana**
-  - Rationale: Primarily configuration backups rather than data. Weekly schedule is sufficient for configuration preservation
-  - Retention: 14 days
+  - Rationale: Dashboard configurations and user data - daily backup preserves custom monitoring setup
+  - Retention: 7 days
 
 - **Prometheus**
-  - Rationale: Primarily configuration backups rather than data. Weekly schedule is sufficient for configuration preservation
-  - Retention: 14 days 
+  - Rationale: Monitoring configuration and historical data - daily backup maintains observability setup
+  - Retention: 7 days 
 
 ### No Backups
 **Services excluded from backup strategy due to size constraints or easy recoverability.**
@@ -59,12 +56,14 @@
 
 ### 3 Copies
 - **Production Copy**: Live data in running services
-- **Local Backup**: On-host backup stored in `/srv/backups/`
+- **Primary Local Backup**: Application SSD backup stored in `/srv/backups/`
+- **Secondary Local Backup**: Filesystem SSD backup stored in `/home/kscheuer/backups/`
 - **External Copy**: External drive backup for additional redundancy
 
-### 2 Types of Media
-- **Local SSD**: Host system storage
-- **External SSD**: Portable external drive
+### 2+ Types of Media
+- **Application SSD**: Hosts services and primary backups (`/srv/backups/`)
+- **Filesystem SSD**: Hosts user data and secondary backups (`/home/kscheuer/backups/`)
+- **External SSD**: Portable external drive for offsite storage
 
 ### 1 Offsite Location
 - **Secure Storage**: External SSD stored in fireproof, waterproof safe 
@@ -211,25 +210,23 @@ crontab -e
 #   Arg1=AppName 
 #   Arg2=RetentionDays
 
-# Daily Backups
+# Daily Backups (staggered every 30 minutes starting at midnight)
 # VaultWarden - 12:00 AM daily
-0 0 * * * /home/kscheuer/BackupScript.sh vaultwarden 14
+0 0 * * * /home/kscheuer/BackupScript.sh vaultwarden 7
 # FileBrowser - 12:30 AM daily  
-30 0 * * * /home/kscheuer/BackupScript.sh filebrowser 14
-
-# Weekly Backups
-# Immich      - Sunday 2:00 AM
-0 2 * * 0 /home/kscheuer/BackupScript.sh immich 7
-# Mealie      - Sunday 3:15 AM
-15 3 * * 0 /home/kscheuer/BackupScript.sh mealie 14
-# AdGuardHome - Sunday 3:30 AM
-30 3 * * 0 /home/kscheuer/BackupScript.sh adguardhome 14
-# Caddy       - Sunday 3:45 AM
-45 3 * * 0 /home/kscheuer/BackupScript.sh caddy 14
-# Grafana     - Sunday 4:00 AM
-0 4 * * 0 /home/kscheuer/BackupScript.sh grafana 14
-# Prometheus  - Sunday 4:15 AM
-15 4 * * 0 /home/kscheuer/BackupScript.sh prometheus 14
+30 0 * * * /home/kscheuer/BackupScript.sh filebrowser 7
+# Mealie - 1:00 AM daily
+0 1 * * * /home/kscheuer/BackupScript.sh mealie 7
+# AdGuardHome - 1:30 AM daily
+30 1 * * * /home/kscheuer/BackupScript.sh adguardhome 7
+# Caddy - 2:00 AM daily
+0 2 * * * /home/kscheuer/BackupScript.sh caddy 7
+# Grafana - 2:30 AM daily
+30 2 * * * /home/kscheuer/BackupScript.sh grafana 7
+# Prometheus - 3:00 AM daily
+0 3 * * * /home/kscheuer/BackupScript.sh prometheus 7
+# Immich - 3:30 AM daily (1-day retention due to size)
+30 3 * * * /home/kscheuer/BackupScript.sh immich 1
 ```
 
 **Verify crontab configuration:**
@@ -243,16 +240,14 @@ sudo crontab -l
 
 ```bash
 # Daily backup services
-/home/kscheuer/BackupScript.sh vaultwarden 14
-/home/kscheuer/BackupScript.sh filebrowser 14
-
-# Weekly backup services
-/home/kscheuer/BackupScript.sh immich 7
-/home/kscheuer/BackupScript.sh mealie 14
-/home/kscheuer/BackupScript.sh adguardhome 14
-/home/kscheuer/BackupScript.sh caddy 14
-/home/kscheuer/BackupScript.sh grafana 14
-/home/kscheuer/BackupScript.sh prometheus 14
+/home/kscheuer/BackupScript.sh vaultwarden 7
+/home/kscheuer/BackupScript.sh filebrowser 7
+/home/kscheuer/BackupScript.sh immich 1
+/home/kscheuer/BackupScript.sh mealie 7
+/home/kscheuer/BackupScript.sh adguardhome 7
+/home/kscheuer/BackupScript.sh caddy 7
+/home/kscheuer/BackupScript.sh grafana 7
+/home/kscheuer/BackupScript.sh prometheus 7
 ```
 
 ### Monitoring and Maintenance
