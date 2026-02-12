@@ -1,0 +1,11 @@
+services:
+  adguard-exporter:
+    image: ghcr.io/henrywhitaker3/adguard-exporter:latest
+    container_name: adguard-exporter
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "9618:9618"
