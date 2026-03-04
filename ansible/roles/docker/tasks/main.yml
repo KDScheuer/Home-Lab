@@ -1,0 +1,49 @@
+---
+# Role: docker
+# Covers: Docker CE install, daemon startup, proxy network, compose directories
+
+- name: Add Docker CE yum repository
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: '0644'
+
+- name: Install Docker CE packages
+  ansible.builtin.dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  notify: Start and enable docker
+
+- name: Enable and start Docker daemon
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Add homelab user to docker group
+  ansible.builtin.user:
+    name: "{{ homelab_user }}"
+    groups: docker
+    append: true
+
+- name: Create docker-compose project directories
+  ansible.builtin.file:
+    path: "{{ homelab_compose_dir }}/{{ item.name }}"
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+  loop: "{{ services }}"
+
+- name: Create docker proxy network
+  ansible.builtin.command: docker network create {{ homelab_docker_network }}
+  register: network_create
+  failed_when:
+    - network_create.rc != 0
+    - '"already exists" not in network_create.stderr'
+  changed_when: network_create.rc == 0

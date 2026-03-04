@@ -1,0 +1,61 @@
+---
+# Role: base
+# Covers: static IP, NTP, required OS packages, SSH hardening
+
+- name: Install base OS packages
+  ansible.builtin.dnf:
+    name:
+      - chrony
+      - pigz
+      - epel-release
+    state: present
+
+- name: Enable and start chronyd
+  ansible.builtin.systemd:
+    name: chronyd
+    enabled: true
+    state: started
+
+- name: Force immediate NTP sync
+  ansible.builtin.command: chronyc makestep
+  changed_when: true
+
+- name: Set static IP via nmcli
+  community.general.nmcli:
+    conn_name: "{{ homelab_interface }}-static"
+    ifname: "{{ homelab_interface }}"
+    type: ethernet
+    ip4: "{{ homelab_address }}"
+    gw4: "{{ homelab_gateway }}"
+    dns4: "{{ homelab_dns }}"
+    method4: manual
+    state: present
+  # This is declarative - nmcli will no-op if already configured
+
+- name: Ensure SSH directory exists for homelab user
+  ansible.builtin.file:
+    path: /home/{{ homelab_user }}/.ssh
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0700'
+
+- name: Disable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    validate: 'sshd -t -f %s'
+  notify: Reload sshd
+
+- name: Enable SSH public key authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+    validate: 'sshd -t -f %s'
+  notify: Reload sshd
+
+- name: Restore SELinux context on .ssh directory
+  ansible.builtin.command: restorecon -R -v /home/{{ homelab_user }}/.ssh
+  changed_when: false

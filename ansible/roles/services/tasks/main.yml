@@ -1,0 +1,65 @@
+---
+# Role: services
+# Deploys all docker-compose stacks, service configs, and static assets.
+#
+# .env files: place real secrets in ansible/env/<service>.env on the controller.
+# These are gitignored. See ansible/env/README.md for required variables per service.
+
+# ── Deploy docker-compose files ──────────────────────────────────────────────
+- name: Deploy docker-compose files for all services
+  ansible.builtin.copy:
+    src: "{{ item.name }}/docker-compose.yml"
+    dest: "{{ homelab_compose_dir }}/{{ item.name }}/docker-compose.yml"
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0644'
+  loop: "{{ services }}"
+
+# ── Deploy service .env files from controller ─────────────────────────────────
+# Source: ansible/env/<service>.env on this machine (gitignored)
+- name: Deploy service .env files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/env/{{ item.name }}.env"
+    dest: "{{ homelab_compose_dir }}/{{ item.name }}/.env"
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0600'
+  loop: "{{ services }}"
+  # Silently skip services that have no .env file
+  failed_when: false
+
+# ── Service-specific config files to /srv ────────────────────────────────────
+- name: Deploy Caddyfile to /srv/caddy/config
+  ansible.builtin.copy:
+    src: caddy/Caddyfile
+    dest: /srv/caddy/config/Caddyfile
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0644'
+
+- name: Deploy prometheus.yml to /srv/prometheus/config
+  ansible.builtin.copy:
+    src: prometheus/prometheus.yml
+    dest: /srv/prometheus/config/prometheus.yml
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0644'
+
+# ── Homepage static files ─────────────────────────────────────────────────────
+- name: Deploy homepage static files to /srv/homepage
+  ansible.builtin.copy:
+    src: homepage/html/
+    dest: /srv/homepage/
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0644'
+
+# ── Start all stacks ──────────────────────────────────────────────────────────
+- name: Start docker-compose stacks
+  ansible.builtin.command:
+    cmd: docker compose up -d --remove-orphans
+    chdir: "{{ homelab_compose_dir }}/{{ item.name }}"
+  loop: "{{ services }}"
+  become_user: "{{ homelab_user }}"
+  register: compose_up
+  changed_when: '"Started" in compose_up.stdout or "Created" in compose_up.stdout'

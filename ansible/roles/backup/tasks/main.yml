@@ -1,0 +1,43 @@
+---
+# Role: backup
+# Deploys backup script to the server and sets up cron jobs.
+# Backup strategy: stop service → tar.gz /srv/<app> → copy to secondary → restart service → prune old
+
+- name: Install pigz for parallel gzip compression
+  ansible.builtin.dnf:
+    name: pigz
+    state: present
+
+- name: Deploy backup script
+  ansible.builtin.copy:
+    src: backup.sh
+    dest: /home/{{ homelab_user }}/backup.sh
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+
+- name: Create primary backup destination directory
+  ansible.builtin.file:
+    path: /srv/backups
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+
+- name: Create secondary backup destination directory
+  ansible.builtin.file:
+    path: /home/{{ homelab_user }}/backups
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+
+- name: Schedule backup cron jobs (run as root to stop/start containers)
+  ansible.builtin.cron:
+    name: "Backup {{ item.name }}"
+    user: root
+    minute: "{{ item.minute }}"
+    hour: "{{ item.hour }}"
+    job: "/home/{{ homelab_user }}/backup.sh {{ item.name }} {{ item.retention }} >> /var/log/backup-{{ item.name }}.log 2>&1"
+    state: present
+  loop: "{{ backup_jobs }}"

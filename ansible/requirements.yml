@@ -1,0 +1,9 @@
+---
+# Ansible Galaxy collection requirements
+# Install with: ansible-galaxy collection install -r requirements.yml
+
+collections:
+  - name: community.general    # parted, nmcli, filesystem
+    version: ">=9.0.0"
+  - name: ansible.posix        # mount module
+    version: ">=1.5.0"

@@ -1,0 +1,20 @@
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TZ: America/Denver
+    volumes:
+      - /srv/caddy/config/Caddyfile:/etc/caddy/Caddyfile
+      - /srv/caddy/data:/data
+      - /srv/certs:/srv/certs:ro
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

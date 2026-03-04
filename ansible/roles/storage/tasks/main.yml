@@ -1,0 +1,75 @@
+---
+# Role: storage
+# Covers: partition /dev/sda, format XFS, persistent mount at /srv,
+#         create all app data directories under /srv
+
+- name: Create GPT partition table on application drive
+  community.general.parted:
+    device: "{{ homelab_srv_device }}"
+    label: gpt
+    state: present
+
+- name: Create primary XFS partition across full drive
+  community.general.parted:
+    device: "{{ homelab_srv_device }}"
+    number: 1
+    fs_type: xfs
+    part_start: "0%"
+    part_end: "100%"
+    state: present
+  register: partition_result
+
+- name: Format partition as XFS
+  community.general.filesystem:
+    fstype: xfs
+    dev: "{{ homelab_srv_device }}1"
+    force: false   # never overwrite existing filesystem
+
+- name: Create /srv mount point
+  ansible.builtin.file:
+    path: "{{ homelab_srv_mount }}"
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+
+- name: Mount /srv persistently via fstab
+  ansible.posix.mount:
+    path: "{{ homelab_srv_mount }}"
+    src: "UUID={{ homelab_srv_uuid }}"
+    fstype: xfs
+    opts: defaults,noatime
+    dump: '0'
+    passno: '2'
+    state: mounted
+
+- name: Create service data directories under /srv
+  ansible.builtin.file:
+    path: "{{ homelab_srv_mount }}/{{ item }}"
+    state: directory
+    owner: "{{ homelab_user }}"
+    group: "{{ homelab_user }}"
+    mode: '0755'
+  loop:
+    - adguardhome/work
+    - adguardhome/conf
+    - caddy/config
+    - caddy/data
+    - filebrowser/srv
+    - filebrowser/database
+    - filebrowser/config
+    - grafana/data
+    - grafana/logs
+    - grafana/plugins
+    - homepage
+    - immich
+    - jellyfin/config
+    - jellyfin/cache
+    - jellyfin/media
+    - mealie/data
+    - mealie/postgres
+    - prometheus/config
+    - prometheus/data
+    - vaultwarden/data
+    - backups
+    - certs/{{ homelab_domain }}

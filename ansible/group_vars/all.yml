@@ -1,0 +1,96 @@
+---
+# ============================================================
+# Host identity
+# ============================================================
+homelab_user: kscheuer
+homelab_domain: kds-dev.com
+homelab_email: kdscheuer97@gmail.com
+homelab_ip: 192.168.50.200
+homelab_timezone: America/Denver
+
+# ============================================================
+# Networking
+# ============================================================
+homelab_interface: enp2s0
+homelab_address: 192.168.50.200/24
+homelab_gateway: 192.168.50.1
+homelab_dns:
+  - 1.1.1.1
+  - 8.8.8.8
+
+# ============================================================
+# Storage
+# ============================================================
+homelab_srv_device: /dev/sda
+homelab_srv_uuid: 3ccd63ec-133c-4ce9-9c41-303759d82267
+homelab_srv_mount: /srv
+
+# ============================================================
+# Docker
+# ============================================================
+homelab_compose_dir: /home/{{ homelab_user }}/docker
+homelab_docker_network: proxy
+
+# ============================================================
+# TLS
+# ============================================================
+homelab_cert_dir: /srv/certs/{{ homelab_domain }}
+# Path where certbot stores the cert - update if re-issued (suffix may increment)
+homelab_letsencrypt_live: /etc/letsencrypt/live/home.{{ homelab_domain }}-0001
+
+# ============================================================
+# Services
+# Each entry drives: directory creation, compose deploy, and
+# backup scheduling. Set backup: false to exclude from cron.
+# ============================================================
+services:
+  - name: adguardhome
+    backup: true
+    retention: 7
+  - name: adguardhome-exporter
+    backup: false
+  - name: caddy
+    backup: true
+    retention: 7
+  - name: filebrowser
+    backup: true
+    retention: 7
+  - name: grafana
+    backup: true
+    retention: 7
+  - name: homepage
+    backup: false
+  - name: immich
+    backup: true
+    retention: 1
+  - name: jellyfin
+    backup: false
+  - name: mealie
+    backup: true
+    retention: 7
+  - name: prometheus
+    backup: true
+    retention: 7
+  - name: vaultwarden
+    backup: true
+    retention: 7
+
+# ============================================================
+# Backup - staggered cron schedule (30 min apart from midnight)
+# Matches the services list above; only entries with backup: true
+# ============================================================
+backup_jobs:
+  - { name: vaultwarden,  minute: "0",  hour: "0",  retention: 7 }
+  - { name: filebrowser,  minute: "30", hour: "0",  retention: 7 }
+  - { name: mealie,       minute: "0",  hour: "1",  retention: 7 }
+  - { name: adguardhome,  minute: "30", hour: "1",  retention: 7 }
+  - { name: caddy,        minute: "0",  hour: "2",  retention: 7 }
+  - { name: grafana,      minute: "30", hour: "2",  retention: 7 }
+  - { name: prometheus,   minute: "0",  hour: "3",  retention: 7 }
+  - { name: immich,       minute: "30", hour: "3",  retention: 1 }
+
+# ============================================================
+# Monitoring
+# ============================================================
+homelab_exporter_port: 9090
+homelab_exporter_user: homelab_exporter
