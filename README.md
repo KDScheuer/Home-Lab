@@ -19,7 +19,7 @@ A 3-node bare-metal Kubernetes cluster built for high availability, zero-touch a
 </p>
 
 ---
-## High Level Diagram
+
 ![k3s Cluster Architecture](docs/k3s.png)
 *3-node k3s cluster — all nodes run the full control plane with embedded etcd. Any node can be lost without interrupting cluster operations or running workloads.*
 
@@ -31,7 +31,6 @@ A 3-node bare-metal Kubernetes cluster built for high availability, zero-touch a
 
 ## Table of Contents
 
-- [High Level Diagram](#high-level-diagram)
 - [Architecture Overview](#architecture-overview)
 - [Provisioning](#provisioning)
 - [Configuration Management](#configuration-management)
@@ -157,7 +156,7 @@ AdGuard Home is the one exception to replica count 1 — it runs one instance pe
 
 MetalLB operates in Layer 2 mode, assigning VIPs from a dedicated pool on the LAN. Services get stable IPs that survive pod rescheduling. Traefik (built into k3s) handles ingress with TLS termination via cert-manager and Let's Encrypt.
 
-![k3s Cluster Architecture](docs/k3s-cluster.png)
+![k3s Cluster Architecture](docs/k3s.png)
 
 > Losing any single node leaves 2 of 3 etcd members online — quorum is maintained and the cluster continues operating normally. Pods reschedule to surviving nodes, NFS volumes remount, and services recover within ~60 seconds with no manual steps.
 
@@ -248,13 +247,27 @@ Tally is a custom push-metrics server built for this homelab. Scripts and batch 
 
 ### Alert coverage
 
->**PLACEHOLDER** What is being alerted on
+| Alert                 | Trigger                                           |
+|-----------------------|---------------------------------------------------|
+| Node down             | Node unreachable for > 2 minutes                  |
+| Pod not running       | Expected pod not in Running state                 |
+| DNS failure           | Either AdGuard Home instance unreachable          |
+| Backup job failed     | Backup script reported failure via Tally          |
+| Backup job missed     | No successful run recorded within expected window |
+| Certificate expiry    | TLS certificate expires within 14 days            |
+| Node disk pressure    | Disk usage exceeds threshold                      |
+| NFS mount unavailable | NFS mount unreachable from a node                 |
 
 > **Diagram placeholder** — metrics flow diagram showing scrape targets, Tally push endpoints, and alert routing to be added once the stack is deployed.
 
 ### Grafana dashboards
 
-> **Dashboard placeholder** — metrics flow diagram showing scrape targets, Tally push endpoints, and alert routing to be added.
+Two dashboards planned, built from scratch:
+
+- **Cluster overview** — node status, pod health, and resource utilization across all three nodes
+- **Backup status** — last run time, success/failure state, and coverage per service
+
+> Dashboard screenshots to be added once the monitoring stack is deployed.
 
 ---
 
