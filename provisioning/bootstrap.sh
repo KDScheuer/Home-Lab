@@ -6,8 +6,9 @@ echo "Configuring provisioning server"
 echo "[+] Updating system packages, this may take a while..."
 sudo dnf update -y > /dev/null && sudo dnf upgrade -y > /dev/null
 
-# Install necessary dependencies
+# Install necessary dependencies (ansible requires EPEL on Rocky Linux 9)
 echo "[+] Installing dependencies"
+sudo dnf install -y epel-release > /dev/null
 sudo dnf install -y git python3 ansible tmux > /dev/null
 
 # Clone or update the homelab repository
