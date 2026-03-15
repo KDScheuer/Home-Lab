@@ -32,7 +32,8 @@ bootloader --location=mbr --drive=sda
 
 # Users
 rootpw --lock
-user --name=ansible --groups=wheel --iscrypted --password='$6$homelab$GOG4nTpUJFoRc/ZmIRWclEmfVMEwQkBfkR7Dry2HZNCm7OvsCENawrjIIZbEgQp6E.DJSiS.rHtUwMcLkL8YQ/'
+user --name=ansible --groups=wheel --lock
+sshkey --username=ansible "{{ ansible_pub_key }}"
 
 # Services
 services --enabled=sshd
@@ -48,13 +49,14 @@ echo "network --bootproto=static --device=$IFACE --ip={{ ip }} --netmask=255.255
 echo "ansible ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/ansible
 chmod 440 /etc/sudoers.d/ansible
 
-# Enable password auth so Ansible can connect on first run
-sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+# Enforce key-only SSH access
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 systemctl restart sshd
 
 # Set hostname explicitly
 hostnamectl set-hostname {{ hostname }}
 
-# Notify HTTP Ready for Ansible
-curl http://192.168.50.4:8080/ansible/{{ ip }}
+# Notify provisioning server — triggers Ansible run
+curl http://{{ server_ip }}:8080/ansible/{{ ip }}
 %end

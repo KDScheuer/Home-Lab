@@ -1,7 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
 import threading
-import os
 
 TEMPLATE = open("homenode.ks").read()
 
@@ -10,7 +9,6 @@ def run_ansible(ip):
         "ansible-playbook",
         "site.yml",
         "-i", f"{ip},",
-        "--vault-password-file", os.path.expanduser("~/.vault_pass")
     ])
     if result.returncode == 0:
         print(f"[+] Ansible completed successfully for {ip}")
