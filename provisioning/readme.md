@@ -11,8 +11,8 @@ Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, appe
 1. Boot the node from a Rocky Linux 9 USB.
 2. The installer presents the boot options screen
 3. A kickstart URL is appended to the boot parameters, pointing at the provisioning server
-4. The node fetches the kickstart file — the server renders the template with the node's IP, hostname, and SSH public key
-5. The kickstart runs unattended: partitioning, user creation, SSH key injection, and sshd hardening
+4. The node fetches the kickstart file
+5. The server renders the template with the node's IP, hostname, and SSH public key. The kickstart runs unattended: partitioning, user creation, SSH key injection, and sshd hardening
 6. On install completion, the node's `%post` script calls back to the provisioning server, triggering an Ansible run
 7. Ansible applies all follow-on configuration while the node reboots
 8. The node comes up fully configured and ready to use
