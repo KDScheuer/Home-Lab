@@ -1,6 +1,0 @@
----
-- name: Restart homelab-exporter
-  ansible.builtin.systemd:
-    name: homelab_exporter
-    state: restarted
-    daemon_reload: true
