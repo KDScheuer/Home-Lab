@@ -299,7 +299,7 @@ Checked items are developed and ready for production. Unchecked items are in sco
 - [X] Kickstart template (`homenode.ks`) — IP and hostname substitution via `%pre`
 - [X] Dynamic Kickstart HTTP server (`http-server.py`) — path-based parameter passing
 - [ ] Automated Ansible trigger on install completion — phone home endpoint
-- [ ] Bootstrap script (`bootstrap.sh`) — one-command provisioning environment
+- [X] Bootstrap script (`bootstrap.sh`) — one-command provisioning environment
 - [ ] Validate end-to-end on VirtualBox before running on hardware
 - [ ] Provision all 3 nodes on bare metal
 
