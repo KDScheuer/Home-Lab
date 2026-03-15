@@ -8,12 +8,14 @@ Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, appe
 
 ![Provisioning Flow](../docs/provisioning-flow.png)
 
-1. A central provisioning server hosts the kickstart template and runs the Ansible playbooks
-2. When booting a new node, the kickstart URL is passed as a boot parameter — the provisioning server responds with a rendered kickstart file containing the correct IP, hostname, and password hash
-3. The kickstart file handles OS installation only — packages, disk layout, user creation, and SSH configuration
-4. On install completion, the node sends a callback to the provisioning server
-5. The provisioning server spawns an Ansible run against that node. By the time the node finishes rebooting, Ansible has already converged it
-6. All future configuration changes are applied exclusively via Ansible, ensuring every node stays identical and can be rebuilt at any time
+1. Boot the node from a Rocky Linux 9 USB.
+2. The installer presents the boot options screen
+3. A kickstart URL is appended to the boot parameters, pointing at the provisioning server
+4. The node fetches the kickstart file — the server renders the template with the node's IP, hostname, and SSH public key
+5. The kickstart runs unattended: partitioning, user creation, SSH key injection, and sshd hardening
+6. On install completion, the node's `%post` script calls back to the provisioning server, triggering an Ansible run
+7. Ansible applies all follow-on configuration while the node reboots
+8. The node comes up fully configured and ready to use
 
 ---
 
@@ -82,7 +84,7 @@ The server is ready when you see it listening on port 8080. Detach with `Ctrl+B,
 |---|---|
 | `bootstrap.sh` | Idempotent setup script for the provisioning server |
 | `http-server.py` | Dynamic kickstart HTTP server — serves rendered kickstart files and triggers Ansible on node callback |
-| `homenode.ks` | Kickstart template — per-node values (`{{ ip }}`, `{{ hostname }}`) are substituted at request time by the HTTP server; server-scoped values (`{{ server_ip }}`, `{{ ansible_pub_key }}`, `{{ ansible_password_hash }}`) are rendered once by `bootstrap.sh` |
+| `homenode.ks` | Kickstart template — per-node values (`{{ ip }}`, `{{ hostname }}`) are substituted at request time by the HTTP server; server-scoped values (`{{ server_ip }}`, `{{ ansible_pub_key }}`) are rendered once by `bootstrap.sh` |
 
 > **Note:** The kickstart template uses `%pre` to dynamically discover the active network interface at install time. It selects the first active non-loopback interface whose name begins with `e`, covering both `ens` and `eth` naming schemes without any hardcoded interface names.
 
