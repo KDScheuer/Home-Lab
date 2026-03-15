@@ -1,219 +1,389 @@
-# Home Lab Infrastructure
+# homelab v2
 
-A self-hosted environment built for my family — giving us control over our media, photos, passwords, and documents without depending on third-party cloud services. Built around reliability, security, and observability practices I use professionally as an SRE.
+**Status: Active Development**
 
-**Status:** Production — running daily for my household.
+A 3-node bare-metal Kubernetes cluster built for high availability, zero-touch automated provisioning, and production-grade operations practices. Running Rocky Linux 9 with SELinux enforcing. Any node can be unplugged at any time — the cluster continues operating and scheduling workloads without any manual intervention.
+
+> v1 ran on a single host with Docker Compose. v2 rebuilds the entire stack on purpose-purchased hardware specifically to implement real HA, learn k3s in depth, and develop skills directly applicable to production Kubernetes environments.
+
+<p>
+  <img src="https://img.shields.io/badge/k3s-FFC61C?style=for-the-badge&logo=k3s&logoColor=black" />
+  <img src="https://img.shields.io/badge/Rocky_Linux-10B981?style=for-the-badge&logo=rockylinux&logoColor=white" />
+  <img src="https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" />
+  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white" />
+  <img src="https://img.shields.io/badge/MetalLB-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailscale-242424?style=for-the-badge&logo=tailscale&logoColor=white" />
+  <img src="https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white" />
+  <img src="https://img.shields.io/badge/SELinux-CC0000?style=for-the-badge&logo=redhat&logoColor=white" />
+</p>
+
+---
+## High Level Diagram
+![k3s Cluster Architecture](docs/k3s.png)
+*3-node k3s cluster — all nodes run the full control plane with embedded etcd. Any node can be lost without interrupting cluster operations or running workloads.*
 
 ---
 
-## Tech Stack
-
-<p>
-  <img src="https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Caddy-00ADD8?style=for-the-badge&logo=caddy&logoColor=white" />
-  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" />
-  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white" />
-  <img src="https://img.shields.io/badge/Tailscale-242424?style=for-the-badge&logo=tailscale&logoColor=white" />
-  <img src="https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white" />
-  <img src="https://img.shields.io/badge/AWS_Route_53-FF9900?style=for-the-badge&logo=amazonroute53&logoColor=white" />
-  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" />
-</p>
+> This document describes the target architecture. The progress tracker at the bottom reflects current implementation state.
 
 ---
 
 ## Table of Contents
 
-- [Why I Built This](#why-i-built-this)
-- [Storage & Mounts](#storage--mounts)
-- [Network & Access](#network--access)
+- [High Level Diagram](#high-level-diagram)
+- [Architecture Overview](#architecture-overview)
+- [Provisioning](#provisioning)
+- [Configuration Management](#configuration-management)
+- [K3s Cluster](#k3s-cluster)
+- [Network Layout](#network-layout)
 - [Services](#services)
-- [Monitoring & Observability](#monitoring--observability)
-- [Backup & Disaster Recovery](#backup--disaster-recovery)
-- [Deployment](#deployment)
+- [Backup and DR](#backup-and-dr)
+- [Monitoring, Observability, and Alerting](#monitoring-observability-and-alerting)
 - [Design Decisions](#design-decisions)
+- [Progress Tracker](#progress-tracker)
 
 ---
 
-## Why I Built This
+## Architecture Overview
 
-I wanted control over what my kids are exposed to online, a way to stream our own media library, and to stop depending on cloud vendors for things like photos, passwords, and documents. Everything here solves a real problem my household actually has.
+Three Lenovo ThinkCentre M710q Tiny nodes running Rocky Linux 9 with SELinux enforcing. All nodes participate in the k3s cluster as server nodes with embedded etcd, providing a true HA control plane — loss of any single node does not interrupt cluster operations or running workloads.
 
-- **Content control** — DNS-level filtering via AdGuard Home blocks ads and inappropriate content across every device on the network without touching individual devices
-- **Media streaming** — Jellyfin replaced third-party streaming services with our own library, accessible to the kids on the local network
-- **Photo management** — Immich replaced cloud photo backup; our family photos stay on hardware we own
-- **Vendor independence** — passwords, files, and recipes all live on infrastructure I control and can restore from scratch
+All persistent storage is NFS-backed against a NAS. No application data lives on node-local storage, which allows k3s to reschedule any pod to any surviving node without manual intervention or data migration.
+
+MetalLB provides VIP assignment in Layer 2 mode. Services get stable LAN IPs that float with their pods regardless of which node they are scheduled on.
+
+> **Diagram placeholder** — physical architecture diagram to be added once cluster is provisioned and validated.
+
+### Design goals
+
+- Unplug any node at any time. Nothing goes down.
+- No manual steps exist outside of version-controlled tooling.
+- Monitoring catches real outages.
+
+### Hardware
+
+| Type    | Role      | Model                  | Notes                  |
+|---------|-----------|------------------------|------------------------|
+| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
+| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
+| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
+| Storage | NAS       | Synology DS418         | 4x 4TB Disks RAID 5    |
+| Network | L2 Switch | Netgear GS308          | 8 Port Unmanaged Switch|
+| Network | Router    | ASUS RT-AX82U          | Home Router            |
+| Network | Modem     | ISP Provided           | -                      |
+
+> OS disks are used for the operating system, k3s binaries, and container image cache only. All application data lives on the NAS over NFS.
 
 ---
 
-## Storage & Mounts
+## Provisioning
 
-![Storage Layout](docs/diagrams/storage-layout.png)
-> *Disks, volumes, NFS mounts, and where data lives*
+### Goal
 
-| Component | Role |
-|-----------|------|
-| Laptop (HDD) | OS and system drive |
-| Laptop (SSD — `/srv`) | Active service data and local backup target |
-| Synology NAS (NFS mount) | Jellyfin media library and backup destination |
-| External SSD (offline) | Air-gapped backup copy, stored in a fireproof/waterproof safe |
-| AWS S3 | Offsite backup — periodic uploads |
+Zero-touch bare metal provisioning. Boot a node from USB, walk away. The node installs Rocky Linux 9, configures itself to a known baseline, and notifies the provisioning server to trigger Ansible automatically. No manual steps after inserting the USB.
 
-All Docker service data lives on the SSD under `/srv`. The NAS is NFS-mounted and serves two purposes — Jellyfin's media library and a backup destination. Nothing critical lives only in one place.
+### High Level Overview
+> For more information on this process refer to [provisioning/readme.md](provisioning/readme.md)
+
+1. A Python HTTP server running on the operator's machine serves the kickstart file and triggers the initial Ansible run
+
+    - Endpoint for serving kickstart files populates the template with the IP and hostname from the URL path:
+      ```
+      http://provisioning-host:8080/ks/192.168.50.101/k3s-node1
+      ```
+
+    - Endpoint that triggers the initial Ansible playbook run:
+      ```
+      http://provisioning-host:8080/ansible/192.168.50.101
+      ```
+
+2. The kickstart file handles OS installation only
+
+3. On install completion the node calls back to the provisioning server to trigger the Ansible playbook
+
+4. The provisioning server spawns an Ansible run against that node automatically. By the time the node finishes rebooting, Ansible has already converged it.
 
 ---
 
-## Network & Access
+## Configuration Management
 
-![Network Diagram](docs/diagrams/network.png)
-> *Traffic flow, network zones, Docker networking, and access control*
+### Goal
 
-All services run under `*.kds-dev.com` with publicly trusted TLS certificates issued via Let's Encrypt using a DNS-01 challenge against Route 53. TLS termination happens at Caddy.
+Every node is identical. No configuration exists outside of Ansible. Running the playbook against a freshly provisioned node or a node that has been running for a year produces the same result. Config drift is structurally impossible when Ansible is the only path to making changes.
 
-Despite having valid public certs and real domain names, **nothing is exposed to the internet**. All external access goes through Tailscale — the domain resolves to internal IPs only reachable over the VPN mesh.
+### Approach
 
-**Network zones:**
-- **Docker Network** — services only reachable through Caddy
-- **Exposed Network** — containers with no internet exposure, communicating only with clients on the trusted LAN
+A single idempotent playbook runs at provisioning time (triggered automatically) and any time configuration changes need to be applied. There is no separate bootstrap playbook. The same playbook runs in both contexts because idempotency means there is no meaningful difference between first run and subsequent runs.
 
-**Access model:**
-- Local network — full access to all services, with AdGuard Home as DNS
-- Tailscale — my wife's and my phones plus the server, for remote access
-- Internet — nothing reachable; Caddy only listens on interfaces accessible via Tailscale or LAN
+### What the playbook manages
+
+**Standard role** — applied to every node
+
+**K3s role** — applied to k3s cluster nodes only
+> Two roles exist so that a non-k3s node can receive the standard OS baseline without k3s-specific tasks being applied. This accommodates future non-cluster nodes without requiring a separate playbook.
+
+### Secrets
+
+All credentials are managed with Ansible Vault. No secrets exist in plain text anywhere in this repository. The vault password lives only on the operator's machine at `~/.vault_pass` and is never committed.
+
+Password authentication is used by Ansible only on the initial connection, keeping the kickstart's responsibilities minimal. The first playbook run populates the trusted SSH key, disables password authentication, and enables public key authentication for all subsequent runs.
+
+---
+
+## K3s Cluster
+
+### Goal
+
+True HA — any single node failure has zero impact on running workloads and zero impact on the ability to schedule new workloads. The control plane survives node loss because all three nodes participate in etcd with quorum maintained at 2 of 3.
+
+### Control plane
+
+All three nodes run as k3s server nodes with embedded etcd. This is the minimum node count for etcd quorum — with 3 nodes, any 2 constitute a majority and the cluster continues operating normally when 1 node is lost.
+
+The operator's laptop is not part of the cluster. It connects via kubeconfig to manage the cluster remotely. Cluster operations are fully independent of the operator's machine being online. All cluster configuration is managed exclusively via Ansible playbooks.
+
+### Workload design
+
+All application workloads run as StatefulSets, not Deployments. Most self-hosted applications couple their database and application process in a single container — StatefulSets provide stable storage identity and ordered pod management that these workloads require even at replica count 1.
+
+Replica count is 1 for all stateful services. The HA story is node failure recovery (pod reschedules to a surviving node, NFS volume remounts, service recovers within ~60 seconds) not simultaneous multi-replica active-active. For household workloads this is the correct tradeoff.
+
+Node Exporter runs as a DaemonSet — one pod per node, automatically present on any node added to the cluster.
+
+AdGuard Home is the one exception to replica count 1 — it runs one instance per node with both IPs configured on the router, providing true simultaneous HA for DNS. DNS resolution has zero failover delay.
+
+### MetalLB
+
+MetalLB operates in Layer 2 mode, assigning VIPs from a dedicated pool on the LAN. Services get stable IPs that survive pod rescheduling. Traefik (built into k3s) handles ingress with TLS termination via cert-manager and Let's Encrypt.
+
+![k3s Cluster Architecture](docs/k3s-cluster.png)
+
+> Losing any single node leaves 2 of 3 etcd members online — quorum is maintained and the cluster continues operating normally. Pods reschedule to surviving nodes, NFS volumes remount, and services recover within ~60 seconds with no manual steps.
+
+---
+
+## Network Layout
+
+### Physical topology
+
+```
+ISP
+ └── Router (192.168.50.1)
+      └── Unmanaged Switch
+           ├── k3s-node1 (192.168.50.101)
+           ├── k3s-node2 (192.168.50.102)
+           ├── k3s-node3 (192.168.50.103)
+           └── NAS       (192.168.50.200)
+```
+
+### Tailscale
+
+Tailscale provides secure remote access to cluster services without exposing anything to the public internet. No ports are forwarded on the router. Access from outside the LAN goes through the Tailscale mesh.
+
+> **Diagram placeholder** — full network diagram including physical topology, MetalLB VIP pool, Tailscale mesh, and DNS flow to be added.
+
+### IP allocation
+
+| Range               | Purpose                  |
+|---------------------|--------------------------|
+| 192.168.50.101–103  | k3s nodes (static)       |
+| 192.168.50.150–160  | MetalLB VIP pool         |
+| 192.168.50.1        | Router / default gateway |
+| 192.168.50.200      | NFS storage              |
+
+### DNS
+
+AdGuard Home provides network-wide DNS with two instances running on separate nodes. The router is configured with the MetalLB VIPs as DNS servers. If a node goes down, the VIP immediately migrates to a surviving node, resulting in zero DNS downtime and no disruption to name resolution or internet access from client devices.
 
 ---
 
 ## Services
 
-<img src="https://img.shields.io/badge/🎬_Media_&_Content-2E86AB?style=for-the-badge" />
-
-| Service | Purpose |
-|---------|---------|
-| **Jellyfin** | Media server — local network only, streams to TVs and devices in the house |
-| **Immich** | Photo and video backup — replaces cloud photo storage for the whole family |
-| **Mealie** | Recipe management and meal planning |
-
-<img src="https://img.shields.io/badge/🔐_Security_&_Access-A23B72?style=for-the-badge" />
-
-| Service | Purpose |
-|---------|---------|
-| **Vaultwarden** | Self-hosted Bitwarden-compatible password manager |
-| **AdGuard Home** | Network-wide DNS filtering — blocks ads and content across all devices, enforces DNS over HTTPS for privacy |
-| **Tailscale** | Mesh VPN for secure remote access |
-
-<img src="https://img.shields.io/badge/⚙️_Infrastructure-2D6A4F?style=for-the-badge" />
-
-| Service | Purpose |
-|---------|---------|
-| **Caddy** | Reverse proxy — TLS termination, automatic HTTPS, request routing |
-| **FileBrowser** | Web-based file access for documents and shared files |
-| **Homepage** | Internal dashboard — single pane of glass for all services |
-
-<img src="https://img.shields.io/badge/📊_Monitoring-E76F51?style=for-the-badge" />
-
-| Service | Purpose |
-|---------|---------|
-| **Prometheus** | Metrics collection and storage |
-| **Grafana** | Dashboards — all built from scratch |
-| **Node Exporter** | Host-level metrics (CPU, memory, disk, network) |
-| **Blackbox Exporter** | Internet connectivity, latency, and up/down monitoring |
-| **SNMP Exporter** | Synology NAS metrics via SNMP |
-| **AdGuard Exporter** | DNS filtering stats and query metrics |
+| Service       | Type        | Replicas   | Storage |
+|---------------|-------------|------------|---------|
+| Vaultwarden   | StatefulSet | 1          | NFS     |
+| Immich        | StatefulSet | 1          | NFS     |
+| Mealie        | StatefulSet | 1          | NFS     |
+| Filebrowser   | StatefulSet | 1          | NFS     |
+| AdGuard Home  | StatefulSet | 2          | NFS     |
+| Grafana       | StatefulSet | 1          | NFS     |
+| Prometheus    | StatefulSet | 1          | NFS     |
+| Tally         | StatefulSet | 1          | NFS     |
+| Jellyfin      | StatefulSet | 1          | NFS     |
+| Node Exporter | DaemonSet   | 1 per node | -       |
 
 ---
 
-## Monitoring & Observability
+## Backup and DR
 
-![Grafana Dashboard](docs/diagrams/grafana-dashboard.png)
+### Goal
 
-All dashboards are built from scratch in Grafana — no community imports. Four exporters feed Prometheus:
+3-2-1 backup strategy — 3 copies of data, on 2 different media types, with 1 copy offsite and immutable. No single failure (hardware, ransomware, human error) results in permanent data loss.
 
-- **Node Exporter** — host CPU, memory, disk usage, and network throughput on the laptop
-- **Blackbox Exporter** — probes internet endpoints for latency and availability; feeds the "is the internet actually working" panel
-- **SNMP Exporter** — scrapes the Synology NAS over SNMP for disk health, volume usage, and network stats
-- **AdGuard Exporter** — pulls DNS query stats, block rates, and client activity from AdGuard Home
+### Planned approach
 
-The SNMP integration was worth the setup effort — it gives full visibility into the NAS without installing anything on it, which matters when the NAS is also a backup target and I don't want extra software risk there.
+> **Work in progress** — backup tooling and implementation TBD. The goal is to implement a 3-2-1 strategy with at least one immutable copy, consistent with the approach used in version 1 of this homelab.
 
 ---
 
-## Backup & Disaster Recovery
+## Monitoring, Observability, and Alerting
 
-![Backup Strategy](docs/diagrams/backup-strategy.png)
-> *3-2-1-1-0 backup strategy across four storage locations*
+### Philosophy
 
-### Strategy
+Alert on actual outages and confirmed failures, not on indicators that might become problems. A firing alert means something is broken or data is at risk right now. Low signal, high confidence.
+> Alerting does not cover soft indicators such as resource pressure or temporary spikes. This is a homelab — sustained issues will be visible on dashboards and addressed on a reasonable timeline. The goal is to avoid alert fatigue from false positives.
 
-| Copy | Location | Media |
-|------|----------|-------|
-| 1st | Laptop SSD (`/srv/backups`) | Internal SSD |
-| 2nd | Synology NAS (NFS) | Network attached storage |
-| 3rd | AWS S3 | Offsite cloud |
-| 4th | External SSD | Air-gapped, offline |
+### Stack
 
-The external SSD lives in a fireproof, waterproof safe bolted to the floor — the air-gap means ransomware or accidental deletion can't reach it.
+| Component     | Role                              |
+|---------------|-----------------------------------|
+| Prometheus    | Metrics collection                |
+| Grafana       | Dashboards and visualization      |
+| Node Exporter | Host-level metrics from all nodes |
+| Tally         | Push-based metrics from scripts   |
+| Alertmanager  | Alert notification delivery       |
 
-### Schedule & Retention
+Tally is a custom push-metrics server built for this homelab. Scripts and batch jobs (e.g. backup runs) push job status and counters to Tally, which exposes them as Prometheus-scrapable metrics. This makes non-instrumented processes visible to Prometheus without a custom exporter per job.
 
-- **Local + NAS backups** — Thursday nights, 4-week retention
-- **Immich (photos)** — Thursday nights, 2-week retention (large dataset, more frequent churn)
-- **AWS S3 + external SSD** — periodic; plugged in and synced manually when needed
+### Alert coverage
 
-### Backup Process
+>**PLACEHOLDER** What is being alerted on
 
-Each backup run follows the same pattern:
-1. Pre-flight checks — disk space, permissions, NAS mount health
-2. Graceful service shutdown via Docker Compose
-3. Parallel compression with `pigz`
-4. Service restart and health verification
-5. Retention enforcement — old backups pruned to policy
-6. Everything logged to syslog
+> **Diagram placeholder** — metrics flow diagram showing scrape targets, Tally push endpoints, and alert routing to be added once the stack is deployed.
 
-Restore procedures are documented and tested for each service. A backup that has never been restored is not a backup.
+### Grafana dashboards
 
----
-
-## Deployment
-
-The entire server — OS config, Docker, TLS, all services, backup cron jobs, and monitoring — is provisioned via Ansible from the `ansible/` directory.
-
-```bash
-# 1. Install collections
-ansible-galaxy collection install -r ansible/requirements.yml
-
-# 2. Place secret .env files in ansible/env/ (see ansible/env/README.md)
-
-# 3. Full provisioning run
-ansible-playbook -i ansible/inventory.yml ansible/site.yml \
-  -e "aws_access_key_id=AKIA... aws_secret_access_key=..."
-```
-
-Roles run in order and are fully idempotent: `base` → `storage` → `docker` → `tls` → `services` → `backup` → `monitoring`.
-Run individual roles with `--tags <role>` (e.g. `--tags services` to redeploy compose stacks).
-
-All variables — service list, backup schedule, paths, domain — live in [`ansible/group_vars/all.yml`](ansible/group_vars/all.yml).
+> **Dashboard placeholder** — metrics flow diagram showing scrape targets, Tally push endpoints, and alert routing to be added.
 
 ---
 
 ## Design Decisions
 
-**🔒 Publicly trusted certs with zero public exposure**
-Using Let's Encrypt with a DNS-01 challenge means I get real, browser-trusted certificates for all services without opening any ports to the internet. Caddy handles renewal automatically via Route 53. Everything resolves correctly on LAN and over Tailscale — it just doesn't resolve anywhere else.
+**All three nodes run as k3s server nodes with embedded etcd — no dedicated control plane**
+A conventional k3s setup uses one server node and multiple agent nodes. With only 3 nodes this means losing the single server node takes down the entire control plane. Running all three as full server nodes with embedded etcd distributes the control plane itself — loss of any one node still leaves 2 of 3 etcd members online, quorum is maintained, and the cluster continues scheduling workloads normally. This is the meaningful difference between a resilient cluster and one that fails when the wrong node goes down.
 
-**📡 SNMP for NAS monitoring instead of installing agents**
-The Synology NAS is a backup target — I want as little extra software running on it as possible. SNMP is built into DSM and exposes everything I need. Running the SNMP exporter as a Docker container on the laptop keeps the monitoring stack self-contained.
+**StatefulSets over Deployments for all application workloads**
+Most self-hosted applications manage their own state in embedded databases or flat files and assume local storage is stable across restarts. StatefulSets provide stable network identity and ordered pod management that these workloads expect, even at replica count 1. Using Deployments here would be technically incorrect, not just a style preference — a deployment with a local volume can silently lose data on reschedule.
 
-**🔄 Node Exporter + Blackbox over a custom exporter**
-An earlier version of this lab ran a custom Python exporter. Replacing it with Node Exporter and Blackbox Exporter gave better coverage, more reliable metrics, and less code to maintain. Using the right tool matters more than building your own.
+**NFS-backed storage with no local persistent volumes**
+Local PVs pin a workload to the node where the disk lives — the exact failure mode this cluster is designed to avoid. With all application data on the NAS, a pod on any surviving node can mount its storage and resume immediately after a node failure. No data migration, no manual remounting. This is what makes the ~60 second recovery window possible.
 
-**🏠 Jellyfin local-only by design**
-Jellyfin is not exposed externally — not through Caddy, not through Tailscale. It's a household service for the local network. Keeping it off the access path entirely reduces attack surface and simplifies the network model.
+**MetalLB Layer 2 over NodePort services**
+NodePort exposes services on ephemeral per-pod IPs using non-standard ports. MetalLB assigns stable LAN IPs from a static pool. The router's DNS entries and AdGuard Home configuration never need to change regardless of which node is currently running a given service. VIPs follow pods, not nodes.
 
-**💾 NFS mount for media and backups**
-Jellyfin's library and one backup destination live on the NAS via NFS rather than copying data to the laptop. Keeps the SSD free for active service data and means the media library can grow independently of local storage.
+**Single idempotent playbook for provisioning and ongoing configuration**
+There is no separate bootstrap playbook. The same Ansible playbook that converges a freshly installed node also reconverges a node that has been running for a year. If a task can only safely run once it becomes a manual step, which eventually drifts. Running the full playbook against any node at any time is always safe by design — this is structurally enforced idempotency, not a documentation promise.
 
 ---
 
-## License
+## Progress Tracker
 
-MIT
+Checked items are developed and ready for production. Unchecked items are in scope.
+
+### Phase 1 — Provisioning
+
+- [X] Kickstart template (`homenode.ks`) — IP and hostname substitution via `%pre`
+- [X] Dynamic Kickstart HTTP server (`http-server.py`) — path-based parameter passing
+- [ ] Automated Ansible trigger on install completion — phone home endpoint
+- [ ] Bootstrap script (`bootstrap.sh`) — one-command provisioning environment
+- [ ] Validate end-to-end on VirtualBox before running on hardware
+- [ ] Provision all 3 nodes on bare metal
+
+> **Notes:** Kickstart template complete and validated in VirtualBox. Interface name is dynamically discovered in `%pre` — no hardcoded interface names. Password auth enabled at kickstart time, disabled by Ansible on first run. Bootstrap script and phone-home trigger in progress.
+
+---
+
+### Phase 2 — Configuration Management
+
+- [ ] Standard role — packages, timezone, NTP, hostname
+- [ ] Standard role — SSH hardening (key-only auth, root login disabled)
+- [ ] Standard role — SELinux enforcing with k3s booleans
+- [ ] Standard role — firewall rules
+- [ ] Standard role — NFS mount via fstab with tuned options
+- [ ] Standard role — kernel modules and sysctl for k3s
+- [ ] Standard role — `/etc/hosts` entries for all cluster nodes
+- [ ] K3s role — server install with embedded etcd (all 3 nodes)
+- [ ] K3s role — cluster join and validation
+- [ ] Ansible Vault for all secrets
+- [ ] Validate idempotency — playbook runs twice, second run zero changes
+
+> **Notes:** Playbook structure and role layout defined. Standard role tasks sequenced and reviewed. K3s role pending hardware availability.
+
+---
+
+### Phase 3 — Cluster
+
+- [ ] 3-node k3s cluster with embedded etcd
+- [ ] Validate etcd quorum — pull one node, confirm cluster healthy
+- [ ] MetalLB install and VIP pool configuration
+- [ ] cert-manager and Let's Encrypt for TLS
+- [ ] Kubeconfig distributed to operator machine
+- [ ] NFS StorageClass and PVC templates
+- [ ] Node Exporter DaemonSet
+
+> **Notes:** Target architecture is all 3 nodes as server nodes with embedded etcd for true HA control plane. etcd quorum maintained at 2 of 3 — single node loss does not interrupt cluster operations or scheduling.
+
+---
+
+### Phase 4 — Services
+
+- [ ] Shared Postgres instance (NFS-backed, used by Vaultwarden, Mealie, Grafana)
+- [ ] Vaultwarden
+- [ ] Immich (NFS permissions resolved)
+- [ ] Mealie
+- [ ] Filebrowser
+- [ ] AdGuard Home (2 instances, one per node, both IPs on router)
+- [ ] Tally
+- [ ] Grafana
+- [ ] Prometheus
+- [ ] Validate failover for each service — pull node, confirm recovery
+
+> **Notes:** All services migrating from Docker Compose on single host. SQLite-backed services (Vaultwarden, Mealie, Grafana) migrating to shared Postgres before cluster deployment. Immich NFS permission issue is a UID mapping problem — solvable with `chown 1000:1000` on NAS export directory.
+
+---
+
+### Phase 5 — Backup and DR
+
+- [ ] Define backup tooling
+- [ ] NAS snapshot policy for local point-in-time recovery
+- [ ] Offsite backup to cold storage (AWS Glacier or Backblaze B2)
+- [ ] Immutable copy strategy (object lock or WORM)
+- [ ] etcd snapshot backup
+- [ ] Backup job metrics via Tally into Prometheus
+- [ ] Backup failure alerts in Alertmanager
+- [ ] DR runbook — document recovery steps for each failure scenario
+
+> **Notes:** 3-2-1 strategy is the target. At least one copy must be immutable. Backup job success/failure will surface via Tally so Prometheus can alert on missed or failed runs. Tooling selection TBD.
+
+---
+
+### Phase 6 — Monitoring and Alerting
+
+- [ ] Prometheus scrape config for all targets
+- [ ] Alertmanager configuration and notification routing
+- [ ] Node down alert
+- [ ] Pod not running alert
+- [ ] DNS failure alert (AdGuard both instances)
+- [ ] Backup job failed alert
+- [ ] Backup job not run within window alert
+- [ ] Certificate expiry alert (14 day window)
+- [ ] Node disk pressure alert
+- [ ] NFS mount unavailable alert
+- [ ] Grafana cluster overview dashboard
+- [ ] Grafana backup status dashboard
+
+> **Notes:** Alert philosophy is low signal, high confidence — a firing alert means something is broken or data is at risk right now, not a potential future problem. Tally is the integration point for non-instrumented processes like backup jobs.
+
+---
+
+### Phase 7 — Hardening and Documentation
+
+- [ ] Tailscale remote access (no public port forwards)
+- [ ] Network diagram
+- [ ] Architecture diagram
+- [ ] Metrics flow diagram
+- [ ] Per-phase documentation complete
+- [ ] Validate full DR scenario end-to-end
+
+> **Notes:** Tailscale provides remote access without exposing anything to the public internet. All diagrams are placeholders until the cluster is provisioned and validated — diagrams will reflect actual running state, not just intended design.
