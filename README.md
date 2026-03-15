@@ -298,9 +298,9 @@ Checked items are developed and ready for production. Unchecked items are in sco
 
 - [X] Kickstart template (`homenode.ks`) — IP and hostname substitution via `%pre`
 - [X] Dynamic Kickstart HTTP server (`http-server.py`) — path-based parameter passing
-- [ ] Automated Ansible trigger on install completion — phone home endpoint
+- [X] Automated Ansible trigger on install completion — phone home endpoint
 - [X] Bootstrap script (`bootstrap.sh`) — one-command provisioning environment
-- [ ] Validate end-to-end on VirtualBox before running on hardware
+- [X] Validate end-to-end on VirtualBox before running on hardware
 - [ ] Provision all 3 nodes on bare metal
 
 > **Notes:** Kickstart template complete and validated in VirtualBox. Interface name is dynamically discovered in `%pre` — no hardcoded interface names. Password auth enabled at kickstart time, disabled by Ansible on first run. Bootstrap script and phone-home trigger in progress.
