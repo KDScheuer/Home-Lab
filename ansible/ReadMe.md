@@ -73,11 +73,18 @@ all:
 
 ### `inventory/group_vars/all.yml`
 
-Variables applied to every host regardless of role. Defines:
+All site-specific configuration in one place — this is the primary file to edit when tuning the environment. Defines:
 
-- `ansible_become`, `ansible_become_method`, `ansible_python_interpreter` — connection defaults
-- `nfs_server` / `nfs_share` — Synology NAS mount details
-- `lab_users` — list of user accounts to create and SSH keys to deploy on every node. Currently contains `home-user`, whose public key is read from the provisioning server at `~/.ssh/home-user.pub`
+| Variable | Purpose |
+|---|---|
+| `ansible_become` / `ansible_become_method` / `ansible_python_interpreter` | Connection defaults |
+| `timezone` | Timezone applied to every node |
+| `ntp_servers` | NTP pool servers written into `chrony.conf` |
+| `nfs_server` / `nfs_share` | Synology NAS address and export path |
+| `nfs_mount_point` | Where the NFS share is mounted on each node |
+| `nfs_mount_opts` | Mount options passed to the `mount` module |
+| `lab_users` | User accounts to create and SSH keys to deploy on every node |
+| `firewall_ports` | Ports opened in firewalld on every node |
 
 ### `inventory/group_vars/k3s_nodes.yml`
 
@@ -101,7 +108,7 @@ Applied to every node. Tasks run in this order:
 | **NFS** | Creates `/mnt/synology` and mounts the Synology NAS share |
 | **Firewall** | Opens ports defined in `firewall_ports` (default: `22/tcp`, `9100/tcp` for Prometheus node exporter) |
 
-Default variables are defined in `roles/standard/defaults/main.yml` and can be overridden per host or group in `group_vars`.
+Default variables are defined in `roles/standard/defaults/main.yml` as fallbacks, ensuring the role has valid values if ever run against an inventory that does not define them. The site's `group_vars/all.yml` always takes precedence over these defaults.
 
 **Handlers** — `sshd` and `chronyd` are restarted only when their respective config tasks report a change, preventing unnecessary service bounces.
 

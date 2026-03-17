@@ -10,7 +10,7 @@
 # -- Time --
 - name: Set timezone
   community.general.timezone:
-    name: America/Boise
+    name: "{{ timezone }}"
 
 - name: Configure chrony
   ansible.builtin.template:
@@ -66,16 +66,16 @@
 # -- NFS --
 - name: Create NFS mount point
   ansible.builtin.file:
-    path: /mnt/synology
+    path: "{{ nfs_mount_point }}"
     state: directory
 
-- name: Mount Synology NFS share
+- name: Mount NFS share
   ansible.posix.mount:
-    path: /mnt/synology
+    path: "{{ nfs_mount_point }}"
     src: "{{ nfs_server }}:{{ nfs_share }}"
     fstype: nfs
     state: mounted
-    opts: defaults,_netdev
+    opts: "{{ nfs_mount_opts }}"
 
 # -- Firewall --
 - name: Open required firewall ports
