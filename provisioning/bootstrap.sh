@@ -8,7 +8,11 @@ sudo dnf update -y && sudo dnf upgrade -y
 
 echo "[+] Installing dependencies"
 sudo dnf install -y epel-release
-sudo dnf install -y git python3 ansible tmux
+sudo dnf install -y git python3 python3-pip tmux
+pip3 install --user --upgrade ansible
+export PATH=$HOME/.local/bin:$PATH
+grep -qxF 'export PATH=$HOME/.local/bin:$PATH' ~/.bashrc \
+    || echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
 
 # -- Repo --
 echo "[+] Syncing repo"
@@ -65,7 +69,7 @@ if tmux has-session -t kickstart_server 2>/dev/null; then
     echo "[!] Restarting existing kickstart_server session"
     tmux kill-session -t kickstart_server
 fi
-tmux new-session -d -s kickstart_server "python3 http-server.py"
+tmux new-session -d -s kickstart_server "export PATH=$HOME/.local/bin:$PATH; python3 http-server.py"
 echo "[+] Attach with: tmux attach -t kickstart_server"
 
 echo "[+] Provisioning server setup complete"
