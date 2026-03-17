@@ -1,0 +1,5 @@
+---
+
+firewall_ports:
+  - 22/tcp
+  - 9100/tcp  

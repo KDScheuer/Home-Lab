@@ -19,6 +19,10 @@ else
     git clone -b v2 https://github.com/kdscheuer/Home-Lab.git ~/homelab > /dev/null
 fi
 
+# -- Ansible collections --
+echo "[+] Installing required Ansible collections"
+ansible-galaxy collection install -r ~/homelab/ansible/requirements.yml --upgrade > /dev/null
+
 # -- SSH key (required) --
 # The public key is injected into every provisioned node via the kickstart sshkey directive.
 # Ansible then connects exclusively via this key — no password auth required.

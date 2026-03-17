@@ -1,15 +1,19 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
 import threading
+import os
 
-TEMPLATE = open("homenode.ks").read()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ANSIBLE_DIR = os.path.join(BASE_DIR, "..", "ansible")
+PLAYBOOK = os.path.join(ANSIBLE_DIR, "site.yml")
+
+TEMPLATE = open(os.path.join(BASE_DIR, "homenode.ks")).read()
 
 def run_ansible(ip):
-    result = subprocess.run([
-        "ansible-playbook",
-        "site.yml",
-        "-i", f"{ip},",
-    ])
+    result = subprocess.run(
+        ["ansible-playbook", PLAYBOOK, "-i", f"{ip},"],
+        cwd=ANSIBLE_DIR
+    )
     if result.returncode == 0:
         print(f"[+] Ansible completed successfully for {ip}")
     else:
