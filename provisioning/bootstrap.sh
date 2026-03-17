@@ -2,6 +2,11 @@
 set -e
 echo "Configuring provisioning server"
 
+# Ensure user-local bin is on PATH for this session and all future logins
+export PATH=$HOME/.local/bin:$PATH
+grep -qxF 'export PATH=$HOME/.local/bin:$PATH' ~/.bashrc \
+    || echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
+
 # -- System packages --
 echo "[+] Updating system packages, this may take a while..."
 sudo dnf update -y && sudo dnf upgrade -y
@@ -9,11 +14,8 @@ sudo dnf update -y && sudo dnf upgrade -y
 echo "[+] Installing dependencies"
 sudo dnf install -y epel-release
 sudo dnf install -y git python3 python3-pip python3.11 tmux
-curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.11
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 python3.11 -m pip install --user --upgrade 'ansible-core>=2.16'
-export PATH=$HOME/.local/bin:$PATH
-grep -qxF 'export PATH=$HOME/.local/bin:$PATH' ~/.bashrc \
-    || echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
 
 # -- Repo --
 echo "[+] Syncing repo"
