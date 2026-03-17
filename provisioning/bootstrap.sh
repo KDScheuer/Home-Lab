@@ -9,6 +9,7 @@ sudo dnf update -y && sudo dnf upgrade -y
 echo "[+] Installing dependencies"
 sudo dnf install -y epel-release
 sudo dnf install -y git python3 python3-pip python3.11 tmux
+sudo python3.11 -m ensurepip --upgrade
 python3.11 -m pip install --user --upgrade 'ansible-core>=2.16'
 export PATH=$HOME/.local/bin:$PATH
 grep -qxF 'export PATH=$HOME/.local/bin:$PATH' ~/.bashrc \
