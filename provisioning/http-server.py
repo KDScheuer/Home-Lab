@@ -4,7 +4,7 @@ import threading
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ANSIBLE_DIR = os.path.join(BASE_DIR, "..", "ansible")
+ANSIBLE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "ansible"))
 PLAYBOOK = os.path.join(ANSIBLE_DIR, "site.yml")
 
 TEMPLATE = open(os.path.join(BASE_DIR, "homenode.ks")).read()
