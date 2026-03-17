@@ -2,12 +2,29 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
 import threading
 import os
+import yaml
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "ansible"))
 PLAYBOOK = os.path.join(ANSIBLE_DIR, "site.yml")
+INVENTORY = os.path.join(ANSIBLE_DIR, "inventory", "hosts.yml")
 
 TEMPLATE = open(os.path.join(BASE_DIR, "homenode.ks")).read()
+
+inventory_lock = threading.Lock()
+
+def register_host(hostname, ip):
+    with inventory_lock:
+        with open(INVENTORY) as f:
+            inv = yaml.safe_load(f)
+        hosts = inv["all"]["children"]["k3s_nodes"]["hosts"]
+        if hostname not in hosts:
+            hosts[hostname] = {"ansible_host": ip}
+            with open(INVENTORY, "w") as f:
+                yaml.dump(inv, f, default_flow_style=False)
+            print(f"[+] Registered {hostname} ({ip}) in inventory")
+        else:
+            print(f"[+] {hostname} already in inventory")
 
 def run_ansible(hostname):
     result = subprocess.run(
@@ -44,6 +61,7 @@ class KickstartHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(f"Ansible request received for {hostname} ({ip})".encode())
             self.log_message(f"Received ansible request for {hostname} ({ip})")
+            register_host(hostname, ip)
             threading.Thread(
                 target=run_ansible,
                 args=(hostname,)
