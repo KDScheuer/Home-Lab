@@ -8,8 +8,8 @@ sudo dnf update -y && sudo dnf upgrade -y
 
 echo "[+] Installing dependencies"
 sudo dnf install -y epel-release
-sudo dnf install -y git python3 python3-pip tmux
-pip3 install --user --upgrade ansible
+sudo dnf install -y git python3 python3-pip python3.11 tmux
+pip3.11 install --user --upgrade ansible-core
 export PATH=$HOME/.local/bin:$PATH
 grep -qxF 'export PATH=$HOME/.local/bin:$PATH' ~/.bashrc \
     || echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc

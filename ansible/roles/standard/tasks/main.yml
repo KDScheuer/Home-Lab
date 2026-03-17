@@ -68,9 +68,6 @@
   ansible.builtin.file:
     path: /mnt/synology
     state: directory
-    owner: "{{ lab_users[0].name }}"
-    group: "{{ lab_users[0].name }}"
-    mode: '0755'
 
 - name: Mount Synology NFS share
   ansible.posix.mount:
