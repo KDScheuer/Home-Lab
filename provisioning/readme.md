@@ -1,6 +1,6 @@
 # Provisioning
 
-Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, append a single boot parameter, and walk away. The node installs itself, calls back to the provisioning server, and Ansible converges it automatically — all before the reboot completes.
+Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, append a single boot parameter, and walk away. The node installs itself, reboots, and once it comes back up Ansible converges it automatically — no manual steps required.
 
 ---
 
@@ -13,8 +13,8 @@ Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, appe
 3. A kickstart URL is appended to the boot parameters, pointing at the provisioning server
 4. The node fetches the kickstart file
 5. The server renders the template with the node's IP, hostname, and SSH public key. The kickstart runs unattended: partitioning, user creation, SSH key injection, and sshd hardening
-6. On install completion, the node's `%post` script calls back to the provisioning server, triggering an Ansible run
-7. Ansible applies all follow-on configuration while the node reboots
+6. On install completion, the node's `%post` script calls back to the provisioning server, triggering an Ansible run, then the node reboots
+7. Ansible waits for the node to come back up after reboot, then applies all follow-on configuration
 8. The node comes up fully configured and ready to use
 
 ---
@@ -26,7 +26,7 @@ Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, appe
 - Fresh Rocky Linux 9 install on a VM or bare metal machine with a static IP on your LAN
 - Bridged networking so provisioned nodes can reach the server during install
 - An SSH key pair at `~/.ssh/ansible` — this public key gets deployed to every provisioned node during install
-- An SSH key pair at `~/.ssh/home-user` — this public key gets deployed to every provisioned node with ansible
+- An SSH key pair at `~/.ssh/home-user` — Ansible reads this from the provisioning server and deploys it to the `home-user` account it creates on every node via the standard role
 
 Generate one if you don't have one:
 ```bash
@@ -44,12 +44,14 @@ chmod +x bootstrap.sh
 ```
 
 The bootstrap script will:
-- Update system packages and install git, python3, ansible, and tmux
+- Update system packages and install git, python3.11, and tmux
+- Install `ansible-core>=2.16` via pip into `~/.local/bin`
+- Install required Ansible Galaxy collections from `requirements.yml`
 - Clone the v2 branch of this repository
 - Auto-detect the provisioning server's IP and inject it into the kickstart template
 - Inject the `~/.ssh/ansible` public key into the kickstart template — provisioned nodes receive this key at install time and disable password auth entirely
 - Open port 8080 in firewalld
-- Start the kickstart HTTP server in a background tmux session
+- Start the kickstart HTTP server in a background tmux session named `kickstart_server` (restarts it if one already exists)
 
 ### Verify the server is running
 
@@ -57,7 +59,7 @@ The bootstrap script will:
 tmux attach -t kickstart_server
 ```
 
-The server is ready when you see it listening on port 8080. Detach with `Ctrl+B, D`.
+The server starts immediately with no output until the first request arrives. Incoming requests are logged to the terminal as they come in. Detach with `Ctrl+B, D`.
 
 ---
 
