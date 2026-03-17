@@ -72,14 +72,13 @@ fi
 
 # -- Start kickstart server --
 echo "[+] Starting kickstart server"
-cd ~/homelab/provisioning
-if tmux has-session -t kickstart_server 2>/dev/null; then
-    echo "[!] Restarting existing kickstart_server session"
-    tmux kill-session -t kickstart_server
+SESSION="kickstart_server"
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    echo "[!] Restarting existing $SESSION session"
+    tmux kill-session -t "$SESSION"
 fi
-tmux new-session -d -s kickstart_server -x 220 -y 50
-tmux set-option -t kickstart_server remain-on-exit on
-tmux send-keys -t kickstart_server "export PATH=$HOME/.local/bin:$PATH; python3.11 http-server.py" Enter
-echo "[+] Attach with: tmux attach -t kickstart_server"
+tmux new-session -d -s "$SESSION" -c ~/homelab/provisioning \
+    'export PATH=$HOME/.local/bin:$PATH; python3.11 http-server.py'
+echo "[+] Kickstart server started — attach with: tmux attach -t $SESSION"
 
 echo "[+] Provisioning server setup complete"

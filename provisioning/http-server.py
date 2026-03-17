@@ -28,7 +28,7 @@ def register_host(hostname, ip):
 
 def run_ansible(hostname):
     result = subprocess.run(
-        ["ansible-playbook", PLAYBOOK, "--limit", hostname],
+        ["ansible-playbook", "-i", INVENTORY, PLAYBOOK, "--limit", hostname],
         cwd=ANSIBLE_DIR
     )
     if result.returncode == 0:
