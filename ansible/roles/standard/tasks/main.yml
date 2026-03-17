@@ -75,10 +75,10 @@
 - name: Mount Synology NFS share
   ansible.posix.mount:
     path: /mnt/synology
-    src: "{{ nfs_server }}:/volume1/nfs_share"
+    src: "{{ nfs_server }}:{{ nfs_share }}"
     fstype: nfs
     state: mounted
-    opts: rw,hard,nointr,rsize=131072,wsize=131072,timeo=600,retrans=3
+    opts: defaults,_netdev
 
 # -- Firewall --
 - name: Open required firewall ports

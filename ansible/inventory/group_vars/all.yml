@@ -3,6 +3,7 @@ ansible_become: true
 ansible_become_method: sudo
 
 nfs_server: 192.168.50.201
+nfs_share: /volume1/networkShare
 
 lab_users:
   - name: home-user
