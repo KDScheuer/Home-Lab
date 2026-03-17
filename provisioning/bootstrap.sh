@@ -14,7 +14,12 @@ sudo dnf update -y && sudo dnf upgrade -y
 echo "[+] Installing dependencies"
 sudo dnf install -y epel-release
 sudo dnf install -y git python3 python3-pip python3.11 tmux
-curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+if ! python3.11 -m pip --version > /dev/null 2>&1; then
+    echo "[+] Bootstrapping pip for python3.11"
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+else
+    echo "[+] pip for python3.11 already present"
+fi
 python3.11 -m pip install --user --upgrade 'ansible-core>=2.16'
 
 # -- Repo --
@@ -72,7 +77,9 @@ if tmux has-session -t kickstart_server 2>/dev/null; then
     echo "[!] Restarting existing kickstart_server session"
     tmux kill-session -t kickstart_server
 fi
-tmux new-session -d -s kickstart_server "export PATH=$HOME/.local/bin:$PATH; python3 http-server.py"
+tmux new-session -d -s kickstart_server -x 220 -y 50
+tmux set-option -t kickstart_server remain-on-exit on
+tmux send-keys -t kickstart_server "export PATH=$HOME/.local/bin:$PATH; python3.11 http-server.py" Enter
 echo "[+] Attach with: tmux attach -t kickstart_server"
 
 echo "[+] Provisioning server setup complete"
