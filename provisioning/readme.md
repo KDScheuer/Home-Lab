@@ -25,11 +25,13 @@ Zero-touch bare metal provisioning. Boot a node from the Rocky Linux 9 ISO, appe
 
 - Fresh Rocky Linux 9 install on a VM or bare metal machine with a static IP on your LAN
 - Bridged networking so provisioned nodes can reach the server during install
-- An SSH key pair at `~/.ssh/ansible` — this public key gets deployed to every provisioned node
+- An SSH key pair at `~/.ssh/ansible` — this public key gets deployed to every provisioned node during install
+- An SSH key pair at `~/.ssh/home-user` — this public key gets deployed to every provisioned node with ansible
 
 Generate one if you don't have one:
 ```bash
 ssh-keygen -t ed25519 -C "homelab-ansible" -f ~/.ssh/ansible -N ""
+ssh-keygen -t ed25519 -C "home-user" -f ~/.ssh/home-user -N ""
 ```
 
 ### Bootstrap

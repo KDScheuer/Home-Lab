@@ -9,15 +9,15 @@ PLAYBOOK = os.path.join(ANSIBLE_DIR, "site.yml")
 
 TEMPLATE = open(os.path.join(BASE_DIR, "homenode.ks")).read()
 
-def run_ansible(ip):
+def run_ansible(hostname):
     result = subprocess.run(
-        ["ansible-playbook", PLAYBOOK, "-i", f"{ip},"],
+        ["ansible-playbook", PLAYBOOK, "--limit", hostname],
         cwd=ANSIBLE_DIR
     )
     if result.returncode == 0:
-        print(f"[+] Ansible completed successfully for {ip}")
+        print(f"[+] Ansible completed successfully for {hostname}")
     else:
-        print(f"[-] Ansible failed for {ip} with return code {result.returncode}")
+        print(f"[-] Ansible failed for {hostname} with return code {result.returncode}")
 
 class KickstartHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -35,17 +35,18 @@ class KickstartHandler(BaseHTTPRequestHandler):
             self.wfile.write(ks.encode())
             self.log_message("served kickstart for %s (%s)", hostname, ip)
     
-        elif len(parts) == 2 and parts[0] == "ansible":
+        elif len(parts) == 3 and parts[0] == "ansible":
             ip = parts[1]
+            hostname = parts[2]
 
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
-            self.wfile.write(f"Ansible request received for {ip}".encode())
-            self.log_message(f"Received ansible request for {ip}")
+            self.wfile.write(f"Ansible request received for {hostname} ({ip})".encode())
+            self.log_message(f"Received ansible request for {hostname} ({ip})")
             threading.Thread(
                 target=run_ansible,
-                args=(ip,)
+                args=(hostname,)
             ).start() 
 
         else:    

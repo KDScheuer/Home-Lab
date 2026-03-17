@@ -58,5 +58,5 @@ systemctl restart sshd
 hostnamectl set-hostname {{ hostname }}
 
 # Notify provisioning server — triggers Ansible run
-curl http://{{ server_ip }}:8080/ansible/{{ ip }}
+curl http://{{ server_ip }}:8080/ansible/{{ ip }}/{{ hostname }}
 %end
