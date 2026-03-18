@@ -309,16 +309,14 @@ Checked items are developed and ready for production. Unchecked items are in sco
 
 ### Phase 2 — Configuration Management
 
-- [ ] Standard role — packages, timezone, NTP, hostname
-- [ ] Standard role — SSH hardening (key-only auth, root login disabled)
-- [ ] Standard role — SELinux enforcing with k3s booleans
-- [ ] Standard role — firewall rules
-- [ ] Standard role — NFS mount via fstab with tuned options
-- [ ] Standard role — kernel modules and sysctl for k3s
-- [ ] Standard role — `/etc/hosts` entries for all cluster nodes
+- [X] Standard role — packages, timezone, NTP, hostname
+- [X] Standard role — SSH hardening (key-only auth, root login disabled)
+- [X] Standard role — SELinux enforcing with k3s booleans
+- [X] Standard role — firewall rules
+- [X] Standard role — NFS mount via fstab
+- [ ] K3s role — `/etc/hosts` entries for all cluster nodes
 - [ ] K3s role — server install with embedded etcd (all 3 nodes)
 - [ ] K3s role — cluster join and validation
-- [ ] Ansible Vault for all secrets
 - [ ] Validate idempotency — playbook runs twice, second run zero changes
 
 > **Notes:** Playbook structure and role layout defined. Standard role tasks sequenced and reviewed. K3s role pending hardware availability.
