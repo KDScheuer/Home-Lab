@@ -1,25 +1,45 @@
 # homelab v2
 
 **Status: Active Development**
+---
+## Infrastructure and Network
+<!-- Link to Hardware Section -->
+This lab is built on 3 ThinkCentres for the compute layer and a Synology NAS for storage. It is built on top of a Proxmox cluster to allow for HA of the management server, as well as enabling VM snapshots, backups, and management.
 
-## Infrastructure and Network Diagram
+[Hardware Specs](#hardware)
 
-### Design Goals
-1. True HA, any single node failure should not bring down a running service
-2. Full IaC, no configuration drift, rebuilds are fast, reproducible, 
-   and standardized
+[Network Charts](#networks)
+
+![Network Diagram](docs/network.png)
+
+## Control Plane
+The Control Plane consists of 3 VMs operating as k3s control plane nodes, and a management server where all automation, IaC, and tooling is executed from. It is designed to be fully HA, allowing any node to go down with no interruption to normal operations.
+
+![Control Plane Diagram](docs/control.png)
+---
+## Services
+Services are reverse proxied via Traefik running on each node, with a virtual IP address in front via MetalLB to handle HA failover. Traffic is routed using service names to cluster IP addresses, which are rewritten by k3s to service addresses to route to the correct pod. All application data is stored on the NAS via NFS mount points in the containers within the pods.
+
+![Services Diagram](docs/services.png)
+---
+## Storage
+- Proxmox is installed on the physical nodes local storage and is the only thing that will be placed there.
+- VM's will be provisioned with 1 50GB disk that will be used to install the OS, required packages, and binaries. It will have a mount to the NAS for application data.
+- NAS has NFS exports for `/vm-disks`, where all VMDKs will be stored, and `/srv`, where subdirectories will be created for each application (e.g. `/srv/jellyfin/`).
+![Storage Diagram](docs/storage.png)
+---
+
+
 
 ### Known Limitations
 1. Flat /24 network — current router does not support VLANs, so control 
    plane, storage, and workload traffic share the same L2 segment
 2. NAS is a single point of failure for storage — mitigated by active/standby 
-   bonded NICs and RAID 6, but a NAS failure takes down both VM disks and 
+   bonded NICs and RAID 5, but a NAS failure takes down both VM disks and 
    application data
 3. Management VM runs both the Tailscale VPN endpoint and IaC tooling 
    (Terraform, Ansible) on the same VM — accepted tradeoff given Tailscale 
    free tier limits and available capacity
-
-![Network Diagram](network.png)
 
 ### Design Decisions
 
@@ -70,6 +90,7 @@
 Pod and Service CIDRs use k3s defaults (10.42.0.0/16 and 10.43.0.0/16) 
 as neither conflicts with existing LAN or Tailscale address space.
 
+## Networks
 ### IP Ranges — 192.168.50.0/24
 
 | Range     | Role                                                        |
@@ -99,7 +120,7 @@ as neither conflicts with existing LAN or Tailscale address space.
 | Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
 | Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
 | Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
-| Storage | NAS       | Synology DS418         | 4x 4TB Disks RAID 5    |
+| Storage | NAS       | Synology DS418         | 4x 4TB Disks, RAID 5   |
 | Network | L2 Switch | Netgear GS308          | 8 Port Unmanaged Switch|
 | Network | Router    | ASUS RT-AX82U          | Home Router            |
 | Network | Modem     | ISP Provided           | -                      |
