@@ -4,14 +4,14 @@ proxmox_timezone: "America/Boise"
 proxmox_debian_release: "trixie"
  
 proxmox_nodes:
-  - name: node01
-    fqdn: node01.kds-dev.com
+  - name: node1
+    fqdn: node1.kds-dev.com
     ip: 192.168.50.101
-  - name: node02
-    fqdn: node02.kds-dev.com
+  - name: node2
+    fqdn: node2.kds-dev.com
     ip: 192.168.50.102
-  - name: node03
-    fqdn: node03.kds-dev.com
+  - name: node3
+    fqdn: node3.kds-dev.com
     ip: 192.168.50.103
  
 proxmox_ntp_servers:

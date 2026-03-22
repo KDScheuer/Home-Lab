@@ -16,3 +16,6 @@
 
 - name: Include NTP tasks
   ansible.builtin.import_tasks: ntp.yml
+
+- name: Include SSH hardening tasks
+  ansible.builtin.import_tasks: ssh.yml

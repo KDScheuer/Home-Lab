@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.6.1" pages="4">
   <diagram name="Infra / Network" id="7T9fYK_7mLtf03JZPUF4">
-    <mxGraphModel dx="1501" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="469" dy="853" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -60,13 +60,13 @@
         <mxCell id="xwsk_G-3L96fwL1GDvPj-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FFFF33);opacity=20;" value="" vertex="1">
           <mxGeometry height="490" width="200" x="590" y="330" as="geometry" />
         </mxCell>
-        <mxCell id="xwsk_G-3L96fwL1GDvPj-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 1&lt;/div&gt;node01.kds-dev.com&lt;div&gt;192.168.50.101&lt;/div&gt;" vertex="1">
+        <mxCell id="xwsk_G-3L96fwL1GDvPj-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 1&lt;/div&gt;node1.kds-dev.com&lt;div&gt;192.168.50.101&lt;/div&gt;" vertex="1">
           <mxGeometry height="40" width="180" x="80" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="xwsk_G-3L96fwL1GDvPj-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 2&lt;/div&gt;node02.kds-dev.com&lt;div&gt;192.168.50.102&lt;/div&gt;" vertex="1">
+        <mxCell id="xwsk_G-3L96fwL1GDvPj-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 2&lt;/div&gt;node2.kds-dev.com&lt;div&gt;192.168.50.102&lt;/div&gt;" vertex="1">
           <mxGeometry height="40" width="180" x="340" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="xwsk_G-3L96fwL1GDvPj-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 3&lt;/div&gt;node03.kds-dev.com&lt;br&gt;&lt;div&gt;192.168.50.103&lt;/div&gt;" vertex="1">
+        <mxCell id="xwsk_G-3L96fwL1GDvPj-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Node 3&lt;/div&gt;node3.kds-dev.com&lt;br&gt;&lt;div&gt;192.168.50.103&lt;/div&gt;" vertex="1">
           <mxGeometry height="40" width="180" x="600" y="340" as="geometry" />
         </mxCell>
         <mxCell id="xwsk_G-3L96fwL1GDvPj-22" edge="1" parent="1" source="xwsk_G-3L96fwL1GDvPj-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=baseDash;endFill=0;dashed=1;strokeColor=light-dark(#000000,#808080);">
