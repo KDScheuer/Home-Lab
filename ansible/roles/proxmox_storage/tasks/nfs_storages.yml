@@ -20,3 +20,23 @@
   loop: "{{ pvesm_check.results }}"
   loop_control:
     label: "{{ item.item.id }}"
+
+- name: Get current NFS storage configuration
+  ansible.builtin.command: pvesh get /storage/{{ item.id }} --output-format json
+  register: pvesm_cfg
+  changed_when: false
+  run_once: true
+  loop: "{{ pve_nfs_storages }}"
+  loop_control:
+    label: "{{ item.id }}"
+
+- name: Update NFS storage content types if changed
+  ansible.builtin.command: pvesm set {{ item.item.id }} --content {{ item.item.content }}
+  vars:
+    current_content: "{{ (item.stdout | from_json).content | split(',') | sort | join(',') }}"
+    desired_content: "{{ item.item.content | split(',') | sort | join(',') }}"
+  when: current_content != desired_content
+  run_once: true
+  loop: "{{ pvesm_cfg.results }}"
+  loop_control:
+    label: "{{ item.item.id }}"

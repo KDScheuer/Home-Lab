@@ -13,7 +13,7 @@ This lab is built on 3 ThinkCentres for the compute layer and a Synology NAS for
 ![Network Diagram](docs/network.png)
 
 ## Control Plane
-The Control Plane consists of 3 VMs operating as k3s control plane nodes, and a management server where all automation, IaC, and tooling is executed from. It is designed to be fully HA, allowing any node to go down with no interruption to normal operations.
+The Control Plane consists of 3 VMs operating as k3s control plane nodes. All management tooling (kubectl, helm, Terraform, Ansible, Flux) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path. It is designed to be fully HA, allowing any node to go down with no interruption to normal operations.
 
 ![Control Plane Diagram](docs/control.png)
 ---
@@ -37,19 +37,19 @@ Services are reverse proxied via Traefik running on each node, with a virtual IP
 2. NAS is a single point of failure for storage — mitigated by active/standby 
    bonded NICs and RAID 5, but a NAS failure takes down both VM disks and 
    application data
-3. Management VM runs both the Tailscale VPN endpoint and IaC tooling 
-   (Terraform, Ansible) on the same VM — accepted tradeoff given Tailscale 
-   free tier limits and available capacity
+3. Tailscale free tier limits devices — ts1 VM holds one of the three device
+   slots; Proxmox HA ensures it restarts on a surviving node if its host fails
 
 ### Design Decisions
 
-1. **Dedicated management VM (vm-mgmt, .131)**
-   A dedicated VM runs Tailscale alongside IaC tooling rather than installing 
-   Tailscale on a Proxmox host directly. Proxmox HA can restart this VM on a 
-   surviving node if its primary host fails, maintaining remote access 
-   automatically. Tailscale free tier allows 3 devices — after two phones, 
-   only one device slot remains, making HA on this VM more important than on 
-   any other single component.
+1. **Dedicated Tailscale VM (ts1, .131)**
+   A dedicated VM runs the Tailscale daemon and advertises the LAN subnet 
+   (192.168.50.0/24) to the tailnet. This allows all remote devices to reach 
+   LAN hosts without installing Tailscale on each one. It runs as a VM under 
+   Proxmox HA rather than as a Kubernetes pod because it must survive cluster 
+   failure — if k3s is broken, ts1 is the recovery path. All management 
+   tooling (kubectl, helm, Terraform, Ansible, Flux) runs in the developer's 
+   WSL environment instead.
 
 2. **k3s on Proxmox VMs rather than bare metal**
    Running k3s inside Proxmox VMs rather than directly on bare metal provides 
@@ -100,7 +100,7 @@ as neither conflicts with existing LAN or Tailscale address space.
 | .100–.109 | Physical nodes (.101, .102, .103)                           |
 | .110–.119 | Control plane VMs (.110 VIP, .111–.113 VMs)                 |
 | .120–.129 | Worker / MetalLB pool (.120 Traefik, .121–.123 worker VMs)  |
-| .130–.139 | Infrastructure VMs (.131 vm-mgmt)                           |
+| .130–.139 | Infrastructure VMs (.131 ts1 — Tailscale subnet router)     |
 | .200–.209 | Storage (.201 Synology NAS)                                 |
 
 ### k3s Internal Networks

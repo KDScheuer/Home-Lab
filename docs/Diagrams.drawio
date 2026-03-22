@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.6.1" pages="4">
   <diagram name="Infra / Network" id="7T9fYK_7mLtf03JZPUF4">
-    <mxGraphModel dx="469" dy="853" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1501" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -74,7 +74,7 @@
             <mxPoint x="416" y="429" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xwsk_G-3L96fwL1GDvPj-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#99FF99);opacity=30;shadow=1;" value="Management Server&lt;div&gt;mgmt01.kds-dev.com&lt;/div&gt;&lt;div&gt;192.168.50.131&lt;/div&gt;&lt;div&gt;HA Between Hosts&lt;/div&gt;" vertex="1">
+        <mxCell id="xwsk_G-3L96fwL1GDvPj-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#99FF99);opacity=30;shadow=1;" value="Tailscale Server&lt;div&gt;ts1.kds-dev.com&lt;/div&gt;&lt;div&gt;192.168.50.131&lt;/div&gt;&lt;div&gt;HA Between Hosts&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="160" x="90" y="400" as="geometry" />
         </mxCell>
         <mxCell id="xwsk_G-3L96fwL1GDvPj-23" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=baseDash;endFill=0;startArrow=baseDash;startFill=0;dashed=1;strokeColor=light-dark(#000000,#808080);">

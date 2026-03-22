@@ -1,0 +1,33 @@
+# Managed by Ansible
+---
+- name: Enable IPv4 forwarding for subnet routing
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: true
+    reload: true
+
+- name: Check if Tailscale is already authenticated
+  ansible.builtin.command: tailscale status --json
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
+- name: Parse Tailscale authentication state
+  ansible.builtin.set_fact:
+    tailscale_is_authenticated: >-
+      {{
+        (tailscale_status.stdout | from_json).BackendState == 'Running'
+        if tailscale_status.rc == 0 and tailscale_status.stdout != ''
+        else false
+      }}
+
+- name: Authenticate and bring up Tailscale with subnet routing
+  ansible.builtin.command: >-
+    tailscale up
+    --authkey={{ tailscale_authkey }}
+    --advertise-routes={{ tailscale_advertise_routes }}
+    {% if tailscale_accept_routes %}--accept-routes{% endif %}
+  when: not tailscale_is_authenticated
+  no_log: true

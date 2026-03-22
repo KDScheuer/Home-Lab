@@ -1,0 +1,7 @@
+# Managed by Ansible
+---
+- name: Include Tailscale installation tasks
+  ansible.builtin.import_tasks: install.yml
+
+- name: Include Tailscale configuration tasks
+  ansible.builtin.import_tasks: configure.yml

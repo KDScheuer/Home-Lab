@@ -1,0 +1,7 @@
+---
+- name: Configure Tailscale subnet router
+  hosts: tailscale
+  become: true
+  roles:
+    - rocky_baseline
+    - tailscale

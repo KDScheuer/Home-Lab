@@ -7,7 +7,7 @@ nas_export_base: "/volume1/networkShare"
 pve_nfs_storages:
   - id: vm-disks
     export: "{{ nas_export_base }}/vm-disks"
-    content: images
+    content: "images,snippets"
   - id: pve-iso
     export: "{{ nas_export_base }}/pve-iso"
     content: "iso,vztmpl"

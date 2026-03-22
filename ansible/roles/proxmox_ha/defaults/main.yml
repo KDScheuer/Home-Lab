@@ -5,4 +5,5 @@ pve_ha_rules:
     nodes: "node1:3,node2:2,node3:1"
     strict: 0
     comment: "Managed by Ansible"
-    resources: []
+    resources:
+      - "vm:131"  # ts1 - Tailscale subnet router
