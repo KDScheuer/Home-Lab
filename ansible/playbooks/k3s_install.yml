@@ -1,0 +1,6 @@
+- hosts: k3s_control
+  roles:
+    - k3s_control
+- hosts: k3s_workers
+  roles:
+    - k3s_worker

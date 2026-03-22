@@ -10,8 +10,8 @@
         <mxCell id="xwsk_G-3L96fwL1GDvPj-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FF8000);opacity=10;" value="" vertex="1">
           <mxGeometry height="570" width="780" x="40" y="270" as="geometry" />
         </mxCell>
-        <mxCell id="xwsk_G-3L96fwL1GDvPj-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Proxmox Cluster" vertex="1">
-          <mxGeometry height="30" width="110" x="40" y="270" as="geometry" />
+        <mxCell id="xwsk_G-3L96fwL1GDvPj-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Proxmox Cluster (homelab)" vertex="1">
+          <mxGeometry height="40" width="120" x="43" y="268" as="geometry" />
         </mxCell>
         <mxCell id="xwsk_G-3L96fwL1GDvPj-45" edge="1" parent="1" source="xwsk_G-3L96fwL1GDvPj-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.443;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;strokeColor=light-dark(#000000,#66FFFF);entryPerimeter=0;" target="xwsk_G-3L96fwL1GDvPj-31">
           <mxGeometry relative="1" as="geometry">

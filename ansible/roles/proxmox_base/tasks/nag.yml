@@ -1,0 +1,22 @@
+---
+- name: Check proxmoxlib.js exists
+  ansible.builtin.stat:
+    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+  register: proxmoxlib_stat
+
+- name: Remove subscription nag from Proxmox web UI
+  ansible.builtin.replace:
+    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    regexp: "if \\(data\\.status !== 'Active'\\)"
+    replace: "if (false)"
+    backup: true
+  when: proxmoxlib_stat.stat.exists
+  notify: restart pveproxy
+
+- name: Verify nag patch was applied
+  ansible.builtin.command:
+    cmd: grep -c "if (false)" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+  register: nag_patch_check
+  changed_when: false
+  failed_when: nag_patch_check.rc != 0
+  when: proxmoxlib_stat.stat.exists
