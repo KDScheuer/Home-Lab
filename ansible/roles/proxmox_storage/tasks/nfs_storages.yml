@@ -1,0 +1,22 @@
+---
+- name: Check if NFS storage already exists
+  ansible.builtin.command: pvesm status --storage {{ item.id }}
+  register: pvesm_check
+  failed_when: false
+  changed_when: false
+  run_once: true
+  loop: "{{ pve_nfs_storages }}"
+  loop_control:
+    label: "{{ item.id }}"
+
+- name: Configure NFS storage
+  ansible.builtin.command: >-
+    pvesm add nfs {{ item.item.id }}
+    --server {{ nas_host }}
+    --export {{ item.item.export }}
+    --content {{ item.item.content }}
+  when: item.rc != 0
+  run_once: true
+  loop: "{{ pvesm_check.results }}"
+  loop_control:
+    label: "{{ item.item.id }}"

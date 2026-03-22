@@ -4,3 +4,4 @@
   become: true
   roles:
     - proxmox_base
+    - proxmox_storage
