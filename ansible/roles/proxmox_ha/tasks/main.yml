@@ -1,0 +1,4 @@
+# Managed by Ansible
+---
+- name: Include HA group configuration tasks
+  ansible.builtin.import_tasks: groups.yml

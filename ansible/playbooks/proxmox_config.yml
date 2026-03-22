@@ -5,3 +5,4 @@
   roles:
     - proxmox_base
     - proxmox_storage
+    - proxmox_ha

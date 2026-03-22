@@ -1,0 +1,6 @@
+# Managed by Ansible
+---
+- name: reload pve-ha-lrm
+  ansible.builtin.service:
+    name: pve-ha-lrm
+    state: restarted

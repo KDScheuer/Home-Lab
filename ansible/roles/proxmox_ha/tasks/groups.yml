@@ -1,0 +1,30 @@
+# Managed by Ansible
+---
+# HA config is cluster-wide (/etc/pve is shared via pmxcfs).
+# run_once ensures ha-manager commands execute on a single node only.
+# Tasks are skipped for rules with an empty resources list.
+
+- name: Check if HA node affinity rule already exists
+  ansible.builtin.command: pvesh get /cluster/ha/rules/{{ item.name }}
+  register: pve_ha_rule_check
+  failed_when: false
+  changed_when: false
+  run_once: true
+  loop: "{{ pve_ha_rules }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Create HA node affinity rule
+  ansible.builtin.command: >-
+    ha-manager rules add node-affinity {{ item.item.name }}
+    --nodes {{ item.item.nodes }}
+    --resources {{ item.item.resources | join(',') }}
+    --strict {{ item.item.strict }}
+  when:
+    - item.rc != 0
+    - item.item.resources | length > 0
+  run_once: true
+  loop: "{{ pve_ha_rule_check.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  notify: reload pve-ha-lrm
