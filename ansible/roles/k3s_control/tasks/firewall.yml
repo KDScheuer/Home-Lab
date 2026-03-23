@@ -1,0 +1,9 @@
+# Managed by Ansible
+---
+- name: Open k3s control plane firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ k3s_control_firewall_ports }}"

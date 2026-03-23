@@ -1,0 +1,10 @@
+# Managed by Ansible
+---
+# Ports required by k3s control plane nodes
+# https://docs.k3s.io/installation/requirements#networking
+k3s_control_firewall_ports:
+  - 6443/tcp    # Kubernetes API server (workers + secondary controllers join here)
+  - 2379/tcp    # etcd client requests
+  - 2380/tcp    # etcd peer communication
+  - 10250/tcp   # kubelet API (metrics, exec, logs)
+  - 8472/udp    # Flannel VXLAN overlay network

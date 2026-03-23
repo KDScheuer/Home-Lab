@@ -5,6 +5,7 @@ Copy private SSH Ket into ~/.ssh/ansible
 ## Install Ansible
 ```bash
 sudo apt install ansible -y
+ansible-galaxy install -r requirements.yml
 ```
 ## Run Ansible
 ```bash

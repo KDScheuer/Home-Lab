@@ -1,9 +1,17 @@
-- hosts: k3s_control
+# Phase 1 — bootstrap control plane
+# ctrl1 initializes the cluster (k3s_control_node: true in hosts.yml)
+# ctrl2 and ctrl3 join it; kube-vip is deployed before k3s starts on each node
+- name: Install k3s control plane
+  hosts: k3s_control
   become: true
   ignore_unreachable: true
   roles:
     - k3s_control
-- hosts: k3s_workers
+
+# Phase 2 — join workers
+# Workers register via the kube-vip VIP (192.168.50.110), not directly to ctrl1
+- name: Install k3s workers
+  hosts: k3s_workers
   become: true
   ignore_unreachable: true
   roles:

@@ -1,0 +1,4 @@
+# Managed by Ansible
+---
+# Non-secret group vars shared across all hosts.
+# Secrets (e.g. k3s_token) live in secrets.yml — see secrets.yml.example.

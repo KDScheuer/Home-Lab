@@ -1,0 +1,19 @@
+# Managed by Ansible
+# k3s control plane role
+# Thin wrapper around the xanmanning.k3s community role.
+# kube-vip manifest is placed before k3s starts so kube-vip comes up automatically.
+# All configuration is driven by group_vars/k3s_control.yml and host_vars (k3s_control_node).
+#
+# Install the community role first:
+#   ansible-galaxy install -r requirements.yml
+---
+- name: Open required firewall ports for k3s control plane
+  ansible.builtin.import_tasks: firewall.yml
+
+- name: Deploy kube-vip manifest before k3s bootstrap
+  ansible.builtin.import_role:
+    name: kube_vip
+
+- name: Install and configure k3s control plane
+  ansible.builtin.import_role:
+    name: xanmanning.k3s

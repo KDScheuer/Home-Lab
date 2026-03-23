@@ -1,0 +1,9 @@
+# Managed by Ansible
+---
+- name: Open k3s worker firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ k3s_worker_firewall_ports }}"

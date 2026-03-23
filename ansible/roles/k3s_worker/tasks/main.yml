@@ -1,0 +1,15 @@
+# Managed by Ansible
+# k3s worker role
+# Thin wrapper around xanmanning.k3s for agent nodes.
+# Workers register to the cluster via the kube-vip VIP, not directly to ctrl1,
+# ensuring HA from day one.
+#
+# Install the community role first:
+#   ansible-galaxy install -r requirements.yml
+---
+- name: Open required firewall ports for k3s worker
+  ansible.builtin.import_tasks: firewall.yml
+
+- name: Install and configure k3s worker agent
+  ansible.builtin.import_role:
+    name: xanmanning.k3s

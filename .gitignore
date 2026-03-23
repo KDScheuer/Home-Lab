@@ -9,6 +9,9 @@ terraform.tfstate.backup
  
 # Variables file containing secrets
 terraform.tfvars
+
+# Ansible secrets — not committed; see secrets.yml.example for required keys
+ansible/inventory/group_vars/all/secrets.yml
  
 # Terraform working directory
 .terraform/
