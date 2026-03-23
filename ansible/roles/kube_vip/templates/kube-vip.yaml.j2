@@ -31,6 +31,13 @@ spec:
         - effect: NoExecute
           operator: Exists
       hostNetwork: true
+      # kube-vip uses hostNetwork so it resolves DNS via the host's resolver (not CoreDNS).
+      # The "kubernetes" service name only exists inside the cluster, so leader election
+      # fails trying to reach https://kubernetes:6443. Map it to localhost where k3s listens.
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "kubernetes"
       containers:
         - name: kube-vip
           image: "{{ kubevip_image }}"
