@@ -68,6 +68,7 @@ resource "proxmox_virtual_environment_vm" "ts1" {
   lifecycle {
     ignore_changes = [
       disk,
+      vga,
     ]
   }
 }

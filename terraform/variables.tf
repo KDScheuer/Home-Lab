@@ -24,13 +24,13 @@ variable "proxmox_node_map" {
   description = "Map of VM name to Proxmox node for pinning"
   type        = map(string)
   default = {
-    ts1     = "node1"
-    ctrl01  = "node1"
-    ctrl02  = "node2"
-    ctrl03  = "node3"
-    work01  = "node1"
-    work02  = "node2"
-    work03  = "node3"
+    ts1    = "node1"
+    ctrl1  = "node1"
+    ctrl2  = "node2"
+    ctrl3  = "node3"
+    work1  = "node1"
+    work2  = "node2"
+    work3  = "node3"
   }
 }
 
