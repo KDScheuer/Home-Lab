@@ -1,6 +1,9 @@
 # homelab v2
 
-**Status: Active Development**
+**Status: Infrastructure Complete — Application Deployment In Progress**
+
+> **Note:** This project was built with AI assistance. Every architecture decision, network design, tooling choice, and tradeoff in this repo is mine — I can speak to all of them.
+
 ---
 ## Infrastructure and Network
 <!-- Link to Hardware Section -->
@@ -10,26 +13,44 @@ This lab is built on 3 ThinkCentres for the compute layer and a Synology NAS for
 
 [Network Charts](#networks)
 
-![Network Diagram](docs/network.png)
+![Network Diagram](docs/assets/network.png)
 
 ## Control Plane
 The Control Plane consists of 3 VMs operating as k3s control plane nodes. All management tooling (kubectl, helm, Terraform, Ansible, Flux) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path. It is designed to be fully HA, allowing any node to go down with no interruption to normal operations.
 
-![Control Plane Diagram](docs/control.png)
+![Control Plane Diagram](docs/assets/control.png)
 ---
 ## Services
 Services are reverse proxied via Traefik running on each node, with a virtual IP address in front via MetalLB to handle HA failover. Traffic is routed using service names to cluster IP addresses, which are rewritten by k3s to service addresses to route to the correct pod. All application data is stored on the NAS via NFS mount points in the containers within the pods.
 
-![Services Diagram](docs/services.png)
+![Services Diagram](docs/assets/services.png)
 ---
 ## Storage
 - Proxmox is installed on the physical nodes local storage and is the only thing that will be placed there.
 - VM's will be provisioned with 1 50GB disk that will be used to install the OS, required packages, and binaries. It will have a mount to the NAS for application data.
 - NAS has NFS exports for `/vm-disks`, where all VMDKs will be stored, and `/srv`, where subdirectories will be created for each application (e.g. `/srv/jellyfin/`).
-![Storage Diagram](docs/storage.png)
+![Storage Diagram](docs/assets/storage.png)
 ---
 
 
+
+## Planned Services
+
+Infrastructure provisioning is complete. The next phase deploys workloads onto the k3s cluster using Helm charts and Kubernetes manifests managed from WSL.
+
+| Service | Purpose |
+|---|---|
+| Traefik | Ingress controller + reverse proxy |
+| MetalLB | Bare-metal load balancer |
+| Grafana / Prometheus | Cluster and node monitoring |
+| Jellyfin | Media server |
+| Immich | Photo management |
+| Vaultwarden | Password manager (Bitwarden-compatible) |
+| Mealie | Recipe and meal planning |
+| FileBrowser | Web-based file management |
+| Homepage | Self-hosted dashboard |
+
+---
 
 ### Known Limitations
 1. Flat /24 network — current router does not support VLANs, so control 
