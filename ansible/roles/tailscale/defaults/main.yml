@@ -1,8 +1,0 @@
-# Managed by Ansible
----
-tailscale_advertise_routes: "192.168.50.0/24"
-tailscale_accept_routes: true
-
-# Override in group_vars/tailscale.yml or pass via --extra-vars.
-# Generate at https://login.tailscale.com/admin/settings/keys
-tailscale_authkey: ""

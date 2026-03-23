@@ -1,6 +1,10 @@
 - hosts: k3s_control
+  become: true
+  ignore_unreachable: true
   roles:
     - k3s_control
 - hosts: k3s_workers
+  become: true
+  ignore_unreachable: true
   roles:
     - k3s_worker

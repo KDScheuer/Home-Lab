@@ -1,4 +1,6 @@
 # Managed by Ansible
+# Ansible configures the system prerequisites for Tailscale (IP forwarding).
+# Joining the tailnet is done manually — see RUNBOOK-tailscale-join.md.
 ---
 - name: Enable IPv4 forwarding for subnet routing
   ansible.posix.sysctl:
@@ -7,27 +9,3 @@
     state: present
     sysctl_set: true
     reload: true
-
-- name: Check if Tailscale is already authenticated
-  ansible.builtin.command: tailscale status --json
-  register: tailscale_status
-  changed_when: false
-  failed_when: false
-
-- name: Parse Tailscale authentication state
-  ansible.builtin.set_fact:
-    tailscale_is_authenticated: >-
-      {{
-        (tailscale_status.stdout | from_json).BackendState == 'Running'
-        if tailscale_status.rc == 0 and tailscale_status.stdout != ''
-        else false
-      }}
-
-- name: Authenticate and bring up Tailscale with subnet routing
-  ansible.builtin.command: >-
-    tailscale up
-    --authkey={{ tailscale_authkey }}
-    --advertise-routes={{ tailscale_advertise_routes }}
-    {% if tailscale_accept_routes %}--accept-routes{% endif %}
-  when: not tailscale_is_authenticated
-  no_log: true
