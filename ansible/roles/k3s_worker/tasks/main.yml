@@ -10,6 +10,26 @@
 - name: Open required firewall ports for k3s worker
   ansible.builtin.import_tasks: firewall.yml
 
+# Guard: if k3s was previously installed in server mode (k3s.service exists but
+# k3s-agent.service does not), the xanmanning.k3s role will see k3s as already
+# installed and skip reinstallation entirely. Detect and uninstall before proceeding.
+- name: Check if k3s is installed in server mode on this worker
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s-uninstall.sh
+  register: k3s_server_uninstall
+
+- name: Check if k3s-agent service already exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/k3s-agent.service
+  register: k3s_agent_service
+
+- name: Uninstall k3s server mode before installing as agent
+  ansible.builtin.command: /usr/local/bin/k3s-uninstall.sh
+  when:
+    - k3s_server_uninstall.stat.exists
+    - not k3s_agent_service.stat.exists
+  changed_when: true
+
 - name: Install and configure k3s worker agent
   ansible.builtin.import_role:
     name: xanmanning.k3s
