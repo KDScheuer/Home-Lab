@@ -6,10 +6,11 @@
 # for these VMs intentionally.
 
 resource "proxmox_virtual_environment_vm" "ctrl1" {
-  vm_id     = 111
-  name      = "ctrl1"
-  node_name = var.proxmox_node_map["ctrl1"]
-  tags      = ["k3s", "control-plane"]
+  vm_id           = 111
+  name            = "ctrl1"
+  node_name       = var.proxmox_node_map["ctrl1"]
+  tags            = ["k3s", "control-plane"]
+  stop_on_destroy = true
 
   description = "k3s control plane node 1 - pinned to node1"
 
@@ -78,10 +79,11 @@ resource "proxmox_virtual_environment_vm" "ctrl1" {
 }
 
 resource "proxmox_virtual_environment_vm" "ctrl2" {
-  vm_id     = 112
-  name      = "ctrl2"
-  node_name = var.proxmox_node_map["ctrl2"]
-  tags      = ["k3s", "control-plane"]
+  vm_id           = 112
+  name            = "ctrl2"
+  node_name       = var.proxmox_node_map["ctrl2"]
+  tags            = ["k3s", "control-plane"]
+  stop_on_destroy = true
 
   description = "k3s control plane node 2 - pinned to node2"
 
@@ -151,10 +153,11 @@ resource "proxmox_virtual_environment_vm" "ctrl2" {
 }
 
 resource "proxmox_virtual_environment_vm" "ctrl3" {
-  vm_id     = 113
-  name      = "ctrl3"
-  node_name = var.proxmox_node_map["ctrl3"]
-  tags      = ["k3s", "control-plane"]
+  vm_id           = 113
+  name            = "ctrl3"
+  node_name       = var.proxmox_node_map["ctrl3"]
+  tags            = ["k3s", "control-plane"]
+  stop_on_destroy = true
 
   description = "k3s control plane node 3 - pinned to node3"
 

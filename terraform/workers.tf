@@ -1,17 +1,10 @@
-# Worker VMs
-# Uncomment after ts1 and control plane VMs are validated
-#
-# All worker VMs are pinned to their respective nodes.
-# k3s handles workload rescheduling on node failure.
-# Proxmox HA is NOT enabled for these VMs intentionally.
-# Workers receive more RAM than control plane VMs as they
-# run all application workloads.
-
+# work1.kds-dev.com
 resource "proxmox_virtual_environment_vm" "work1" {
-  vm_id     = 121
-  name      = "work1"
-  node_name = var.proxmox_node_map["work1"]
-  tags      = ["k3s", "worker"]
+  vm_id           = 121
+  name            = "work1"
+  node_name       = var.proxmox_node_map["work1"]
+  tags            = ["k3s", "worker"]
+  stop_on_destroy = true
 
   description = "k3s worker node 1 - pinned to node1"
 
@@ -78,12 +71,14 @@ resource "proxmox_virtual_environment_vm" "work1" {
     ignore_changes = [disk, vga]
   }
 }
-#
+
+# work2.kds-dev.com
 resource "proxmox_virtual_environment_vm" "work2" {
-  vm_id     = 122
-  name      = "work2"
-  node_name = var.proxmox_node_map["work2"]
-  tags      = ["k3s", "worker"]
+  vm_id           = 122
+  name            = "work2"
+  node_name       = var.proxmox_node_map["work2"]
+  tags            = ["k3s", "worker"]
+  stop_on_destroy = true
 
   description = "k3s worker node 2 - pinned to node2"
 
@@ -101,7 +96,7 @@ resource "proxmox_virtual_environment_vm" "work2" {
   memory {
     dedicated = 10240
   }
-#
+
   disk {
     datastore_id = var.storage_pool
     interface    = "scsi0"
@@ -152,11 +147,13 @@ resource "proxmox_virtual_environment_vm" "work2" {
   }
 }
 
+# work3.kds-dev.com
 resource "proxmox_virtual_environment_vm" "work3" {
-  vm_id     = 123
-  name      = "work3"
-  node_name = var.proxmox_node_map["work3"]
-  tags      = ["k3s", "worker"]
+  vm_id           = 123
+  name            = "work3"
+  node_name       = var.proxmox_node_map["work3"]
+  tags            = ["k3s", "worker"]
+  stop_on_destroy = true
 
   description = "k3s worker node 3 - pinned to node3"
 
