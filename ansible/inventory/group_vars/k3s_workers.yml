@@ -3,7 +3,9 @@
 ---
 
 # --- xanmanning.k3s role configuration ---
-k3s_role: agent
+# The role uses k3s_control_node (not k3s_role) to decide server vs agent mode.
+# Explicitly set false here to prevent any ambiguity.
+k3s_control_node: false
 
 # Workers connect to the cluster via the kube-vip VIP, not directly to ctrl1.
 # This ensures HA from day one — no single point of failure at the API endpoint.

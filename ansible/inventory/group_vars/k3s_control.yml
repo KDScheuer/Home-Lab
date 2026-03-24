@@ -9,6 +9,10 @@ kubevip_interface: "eth0"
 # --- xanmanning.k3s role configuration ---
 k3s_role: server
 
+# Cluster join token — xanmanning.k3s requires this to be set via k3s_control_token,
+# not as 'token:' inside k3s_server (the role's preflight check rejects that).
+k3s_control_token: "{{ k3s_token }}"
+
 # Use the embedded etcd datastore for HA (not SQLite or external DB).
 # k3s_etcd_datastore is the xanmanning.k3s variable — it passes --cluster-init
 # to the first server node and --server to the joining nodes.
