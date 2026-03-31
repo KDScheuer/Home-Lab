@@ -296,7 +296,7 @@ This is the source of truth. If the NFS snippet is ever lost or
 corrupted, restore it from Git:
 
 ```bash
-cp cloud-init/rocky9-cloudinit.yml \
+cp rocky9-cloudinit.yml \
   /mnt/pve/vm-disks/snippets/rocky9-cloudinit.yml
 ```
 
