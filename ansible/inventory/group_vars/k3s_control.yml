@@ -26,3 +26,7 @@ k3s_disable:
 
 # kubeconfig permissions — allows ansible user to run kubectl without sudo.
 k3s_kubeconfig_mode: "0644"
+
+# Pod and service CIDRs
+k3s_pod_cidr: "10.42.0.0/16"
+k3s_service_cidr: "10.43.0.0/16"
