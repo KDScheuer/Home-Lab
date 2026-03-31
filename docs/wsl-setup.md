@@ -12,6 +12,11 @@ sudo apt install -y ansible dos2unix
 sudo snap install terraform --classic
 sudo snap install kubectl --classic
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+helm repo add metallb https://metallb.github.io/metallb
+helm repo add traefik https://helm.traefik.io/traefik
+helm repo add cert-manager https://charts.jetstack.io
+helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+helm repo update
 ```
 
 ---
