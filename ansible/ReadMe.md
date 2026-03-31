@@ -9,7 +9,6 @@ Ansible manages Proxmox node configuration and all VM provisioning. All playbook
 ```
 ansible/
 ├── ansible.cfg
-├── requirements.yml              # Community role dependencies
 ├── inventory/
 │   ├── hosts.yml                 # Host inventory
 │   └── group_vars/
@@ -30,8 +29,8 @@ ansible/
     ├── proxmox_storage/          # NFS storage mounts and content type config
     ├── proxmox_ha/               # HA group creation and policy
     ├── rocky_baseline/           # OS baseline for all Rocky VMs
-    ├── k3s_control/              # control plane: firewall + kube-vip + xanmanning.k3s
-    ├── k3s_worker/               # workers: firewall + xanmanning.k3s agent
+    ├── k3s_control/              # control plane: firewall + kube-vip + direct k3s install
+    ├── k3s_worker/               # workers: firewall + direct k3s agent install
     ├── kube_vip/                 # Drops kube-vip static manifest before k3s starts
     └── tailscale/                # Installs Tailscale daemon and enables routing
 ```
@@ -39,14 +38,6 @@ ansible/
 ---
 
 ## Setup
-
-### Install dependencies
-
-```bash
-ansible-galaxy install -r requirements.yml
-```
-
-This installs `xanmanning.k3s` — the community role that handles k3s installation and cluster bootstrapping.
 
 ### Configure secrets
 
@@ -110,8 +101,8 @@ ansible-playbook playbooks/site.yml
 | `proxmox_ha` | Proxmox nodes | Creates HA groups with node affinity policies |
 | `rocky_baseline` | All VMs | Package updates, chrony NTP, hostname, SSH hardening, SELinux enforcement, firewalld |
 | `kube_vip` | ctrl1/ctrl2/ctrl3 | Places kube-vip static manifest in k3s auto-deploy directory |
-| `k3s_control` | ctrl1/ctrl2/ctrl3 | Opens firewall ports, deploys kube-vip manifest, runs `xanmanning.k3s` (server) |
-| `k3s_worker` | work1/work2/work3 | Opens firewall ports, runs `xanmanning.k3s` (agent) |
+| `k3s_control` | ctrl1/ctrl2/ctrl3 | Opens firewall ports, deploys kube-vip manifest, installs k3s server directly |
+| `k3s_worker` | work1/work2/work3 | Opens firewall ports, installs k3s agent directly |
 | `tailscale` | ts1 | Installs Tailscale, enables daemon, configures subnet routing |
 
 ---

@@ -5,6 +5,14 @@
 > **Note:** This project was built with AI assistance. Every architecture decision, network design, tooling choice, and tradeoff in this repo is mine — I can speak to all of them.
 
 ---
+
+## Deployment & Operations
+
+### Fresh Deploy / Rebuild from Scratch
+See [docs/how-to-deploy.md](docs/how-to-deploy.md) for the full ordered guide covering NAS, WSL, Terraform, Ansible, and Tailscale setup.
+
+---
+
 ## Infrastructure and Network
 <!-- Link to Hardware Section -->
 This lab is built on 3 ThinkCentres for the compute layer and a Synology NAS for storage. It is built on top of a Proxmox cluster to allow for HA of the management server, as well as enabling VM snapshots, backups, and management.

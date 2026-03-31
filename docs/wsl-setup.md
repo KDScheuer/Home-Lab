@@ -1,83 +1,76 @@
 # WSL Setup
 
-Management tooling (Ansible, Terraform, kubectl) runs from WSL2 (Ubuntu) on the developer's Windows machine.
+Getting a fresh Ubuntu WSL instance up to speed for managing the homelab — Terraform, Ansible, kubectl, and Helm all configured and ready to run.
 
 ---
 
-## SSH Key
-
-Copy your Ansible private key into `~/.ssh/` and set correct permissions:
+## 1. Install Required Tools
 
 ```bash
-cp /mnt/c/Users/<your-user>/path/to/ansible ~/.ssh/ansible
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ansible dos2unix
+sudo snap install terraform --classic
+sudo snap install kubectl --classic
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+---
+
+## 2. Clone the Repository
+
+```bash
+cd ~
+git clone -b v2 https://github.com/KDScheuer/Home-Lab.git
+```
+
+---
+
+## 3. Configure SSH Key
+
+Copy the Ansible SSH private key into `~/.ssh/` and set correct permissions:
+
+```bash
+mkdir -p ~/.ssh
+cp /mnt/c/Users/kdsch/.ssh/ansible ~/.ssh/ansible
 chmod 600 ~/.ssh/ansible
 ```
 
-Or generate a new key pair:
+---
+
+## 4. Configure Environment Variables
+
+The `.env` file lives in the repo root and is sourced on every shell open via `~/.bashrc`.
+Fill in any missing values (AWS keys, etc.) before sourcing.
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/ansible -C "ansible@homelab"
+echo "source <(tr -d '\r' < ~/Home-Lab/.env)" >> ~/.bashrc
+source ~/.bashrc
 ```
 
-The **public key** (`~/.ssh/ansible.pub`) is what you paste into Proxmox nodes (step 1.3 of the deployment guide) and into `terraform.tfvars` as `ssh_public_key`.
+> If this is a brand new machine with no `.env` yet, copy the example first:
+> ```bash
+> cp ~/Home-Lab/.env.example ~/Home-Lab/.env
+> # Edit ~/Home-Lab/.env and fill in all values, then re-run the source line above
+> ```
 
 ---
 
-## Ansible
+## 5. Configure kubectl
 
-```bash
-sudo apt update && sudo apt install -y ansible
-ansible-galaxy install -r /path/to/repo/ansible/requirements.yml
-```
-
-### Running Ansible
-
-Run from the repo's `ansible/` directory — `ansible.cfg` sets the inventory path automatically:
-
-```bash
-cd /path/to/repo/ansible
-ansible-playbook playbooks/site.yml
-```
-
-Or specify the config explicitly:
-
-```bash
-ANSIBLE_CONFIG=/path/to/repo/ansible/ansible.cfg ansible-playbook playbooks/proxmox_config.yml
-```
-
----
-
-## Terraform
-
-```bash
-sudo snap install terraform --classic
-```
-
-### Running Terraform
-
-```bash
-cd /path/to/repo/terraform
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
-```
-
----
-
-## kubectl
-
-```bash
-sudo snap install kubectl --classic
-```
-
-### Getting the kubeconfig
-
-After the cluster is up, copy the kubeconfig from ctrl1 and point it at the kube-vip VIP:
+> **This step requires a running cluster.** Skip and return here after completing the cluster deployment in [infra-and-cluster-deployment.md](infra-and-cluster-deployment.md).
 
 ```bash
 mkdir -p ~/.kube
-scp ansible@192.168.50.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+# Copy kubeconfig from ctrl1
+scp -i ~/.ssh/ansible ansible@192.168.50.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+# Point it at the kube-vip VIP instead of localhost
 sed -i 's/127.0.0.1/192.168.50.110/g' ~/.kube/config
+
+# Lock down permissions
 chmod 600 ~/.kube/config
+
+# Verify — should list all nodes
 kubectl get nodes
 ```
