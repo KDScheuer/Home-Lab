@@ -12,7 +12,7 @@ variable "proxmox_api_token" {
 variable "ssh_private_key_path" {
   description = "Path to SSH private key for Proxmox SSH access"
   type        = string
-  default     = "~/.ssh/id_ed25519"
+  default     = "~/.ssh/ansible"
 }
 
 variable "ssh_public_key" {
