@@ -18,7 +18,7 @@ helm upgrade metallb metallb/metallb \
 
 Apply
 ``` bash
-cd ~/Home-Lab/helm/metallb
+cd ~/Home-Lab/helm/infra/metallb
 kubectl apply -f ipaddresspool.yml
 ```
 

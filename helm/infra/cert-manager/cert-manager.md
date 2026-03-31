@@ -32,7 +32,7 @@ kubectl patch validatingwebhookconfiguration cert-manager-webhook \
 
 Install
 ```bash
-cd ~/Home-Lab/helm/cert-manager
+cd ~/Home-Lab/helm/infra/cert-manager
 envsubst < clusterissuer.yaml | kubectl apply -f -
 ```
 

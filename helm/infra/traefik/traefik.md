@@ -15,7 +15,7 @@ Comment Out TLS Store until TLS cert has been issued
 
 Install
 ```bash
-cd ~/Home-Lab/helm/traefik
+cd ~/Home-Lab/helm/infra/traefik
 
 helm install traefik traefik/traefik \
   --namespace traefik \
@@ -36,7 +36,7 @@ kubectl -n traefik get svc
 
 Once cert has been issued uncomment the lines from step one and run
 ```bash
-cd ~/Home-Lab/helm/traefik
+cd ~/Home-Lab/helm/infra/traefik
 
 helm upgrade traefik traefik/traefik \
   --namespace traefik \
