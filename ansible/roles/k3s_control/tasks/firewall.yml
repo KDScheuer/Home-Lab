@@ -7,3 +7,25 @@
     immediate: true
     state: enabled
   loop: "{{ k3s_control_firewall_ports }}"
+
+- name: Add pod CIDR to trusted zone
+  ansible.posix.firewalld:
+    zone: trusted
+    source: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - "{{ k3s_pod_cidr }}"
+    - "{{ k3s_service_cidr }}"
+
+- name: Add flannel interface to trusted zone
+  ansible.posix.firewalld:
+    zone: trusted
+    interface: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - flannel.1
+    - cni0
