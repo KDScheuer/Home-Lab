@@ -21,10 +21,21 @@ ports:
     port: 80
     expose:
       default: true
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
   websecure:
     port: 443
     expose:
       default: true
+
+tlsStore:
+  default:
+    defaultCertificate:
+      secretName: wildcard-kds-dev-com-tls
 
 logs:
   general:
