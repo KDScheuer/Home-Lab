@@ -1,7 +1,0 @@
-# Managed by Ansible
-# Install with: ansible-galaxy install -r requirements.yml
----
-roles:
-  - name: xanmanning.k3s
-    src: https://github.com/PyratLabs/ansible-role-k3s
-    version: main

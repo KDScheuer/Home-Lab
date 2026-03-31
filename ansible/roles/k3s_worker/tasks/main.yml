@@ -1,10 +1,6 @@
 # Managed by Ansible
-# k3s worker role — direct install, not using xanmanning.k3s.
-#
-# xanmanning.k3s defaults to server mode and its idempotency guard prevents
-# the service file from being regenerated when k3s is already present — making
-# it unreliable for agent installs. This role uses the official k3s install
-# script directly, which correctly installs agent mode when K3S_URL is set.
+# k3s worker role — direct install using the official k3s install script.
+# Uses K3S_URL to trigger agent mode; idempotency is gated on binary presence.
 ---
 - name: Open required firewall ports for k3s worker
   ansible.builtin.import_tasks: firewall.yml
@@ -38,7 +34,7 @@
   environment:
     K3S_URL: "https://{{ k3s_registration_address }}:6443"
     K3S_TOKEN: "{{ k3s_token }}"
-    K3S_NODE_NAME: "{{ ansible_hostname }}"
+    K3S_NODE_NAME: "{{ ansible_fqdn }}"
     INSTALL_K3S_SKIP_START: "false"
   when: k3s_agent_status.status is not defined or k3s_agent_status.status.ActiveState | default('') != 'active'
   changed_when: true
@@ -51,7 +47,7 @@
 
 - name: Wait for worker node to register with the cluster
   ansible.builtin.command: >
-    /usr/local/bin/k3s kubectl get node {{ ansible_hostname }}
+    /usr/local/bin/k3s kubectl get node {{ ansible_fqdn }}
   delegate_to: "{{ groups['k3s_control'][0] }}"
   become: true
   register: node_ready
@@ -62,7 +58,7 @@
 
 - name: Label worker nodes with role=worker
   ansible.builtin.command: >
-    /usr/local/bin/k3s kubectl label node {{ ansible_hostname }}
+    /usr/local/bin/k3s kubectl label node {{ ansible_fqdn }}
     kubernetes.io/role=worker
     --overwrite
   delegate_to: "{{ groups['k3s_control'][0] }}"

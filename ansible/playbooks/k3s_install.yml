@@ -1,10 +1,12 @@
 # Phase 1 — bootstrap control plane
-# ctrl1 initializes the cluster (k3s_control_node: true in hosts.yml)
-# ctrl2 and ctrl3 join it; kube-vip is deployed before k3s starts on each node
+# serial: 1 is critical — ctrl1 completes all tasks (including verify.yml) before
+# ctrl2 starts.  This guarantees:
+#   - The node-token exists on ctrl1 when token.yml runs on ctrl2/ctrl3
+#   - etcd quorum is not disrupted by simultaneous joins
 - name: Install k3s control plane
   hosts: k3s_control
   become: true
-  ignore_unreachable: true
+  serial: 1
   roles:
     - k3s_control
 

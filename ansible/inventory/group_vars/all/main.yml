@@ -1,4 +1,5 @@
 # Managed by Ansible
 ---
 # Non-secret group vars shared across all hosts.
-# Secrets (e.g. k3s_token) live in secrets.yml — see secrets.yml.example.
+# Secrets (k3s_token, AWS keys, etc.) live in secrets.yml which reads from .env.
+# See .env.example at the repo root for all required values.

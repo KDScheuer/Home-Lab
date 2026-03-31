@@ -2,44 +2,27 @@
 # Variables for k3s control plane nodes (ctrl1, ctrl2, ctrl3)
 ---
 
-# --- kube-vip (env-specific overrides of role defaults) ---
+# ── kube-vip ──────────────────────────────────────────────────────────────────
+# Overrides of kube_vip role defaults for this environment.
 kubevip_vip: "192.168.50.110"
 kubevip_interface: "eth0"
 
-# --- xanmanning.k3s role configuration ---
-k3s_role: server
+# ── k3s direct install ────────────────────────────────────────────────────────
+# k3s_api_vip defaults to kubevip_vip in the role defaults — no override needed
+# unless the VIP address differs from the kube-vip VIP.
 
-# Cluster join token — xanmanning.k3s requires this to be set via k3s_control_token,
-# not as 'token:' inside k3s_server (the role's preflight check rejects that).
-k3s_control_token: "{{ k3s_token }}"
+# TLS SANs — VIP + all control plane IPs so the cert is valid regardless of
+# which node kubectl connects to.  Must be updated if IPs change.
+k3s_tls_sans:
+  - "192.168.50.110"   # kube-vip VIP  (also defaults via k3s_api_vip)
+  - "192.168.50.111"   # ctrl1
+  - "192.168.50.112"   # ctrl2
+  - "192.168.50.113"   # ctrl3
 
-# Use the embedded etcd datastore for HA (not SQLite or external DB).
-# k3s_etcd_datastore is the xanmanning.k3s variable — it passes --cluster-init
-# to the first server node and --server to the joining nodes.
-k3s_etcd_datastore: true
+# Bundled components to disable — replaced by Flux-managed Helm releases.
+k3s_disable:
+  - traefik
+  - servicelb
 
-# Disable bundled components — replaced by Flux-managed Helm releases
-k3s_server:
-  disable:
-    - traefik
-    - servicelb
-  # TLS SANs — include VIP and all control plane IPs so the cert is
-  # valid regardless of which node kubectl connects to
-  tls-san:
-    - "192.168.50.110"   # kube-vip VIP
-    - "192.168.50.111"   # ctrl1
-    - "192.168.50.112"   # ctrl2
-    - "192.168.50.113"   # ctrl3
-  # Use flannel (k3s default CNI)
-  flannel-backend: "vxlan"
-  # Write kubeconfig with correct permissions
-  write-kubeconfig-mode: "0644"
-
-# All three nodes are control plane members — the role counts hosts with
-# k3s_control_node: true to determine HA topology. The primary/init node
-# is elected automatically (first host in play order).
-k3s_control_node: true
-
-# Required when running as a non-root user — tells the role's own tasks to
-# use privilege escalation (play-level become does not propagate into the role).
-k3s_become: true
+# kubeconfig permissions — allows ansible user to run kubectl without sudo.
+k3s_kubeconfig_mode: "0644"
