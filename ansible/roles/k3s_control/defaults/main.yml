@@ -9,7 +9,8 @@ k3s_control_firewall_ports:
   - 2380/tcp    # etcd peer communication
   - 10250/tcp   # kubelet API (metrics, exec, logs)
   - 8472/udp    # Flannel VXLAN overlay network
-
+  - 53/tcp      # CoreDNS
+  - 53/udp      # CoreDNS
 # ── Install ───────────────────────────────────────────────────────────────────
 # Official k3s install script
 k3s_install_url: "https://get.k3s.io"

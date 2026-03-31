@@ -5,3 +5,7 @@
 k3s_worker_firewall_ports:
   - 10250/tcp   # kubelet API (metrics, exec, logs)
   - 8472/udp    # Flannel VXLAN overlay network
+  - 80/tcp      # Traefik ingress
+  - 443/tcp     # Traefik ingress
+  - 53/tcp      # CoreDNS
+  - 53/udp      # CoreDNS
