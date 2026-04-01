@@ -1,155 +1,145 @@
-# homelab v2
+# homelab
 
-**Status: Infrastructure Complete — Application Deployment In Progress**
+### Virtualized locally hosted HA k3s cluster with NFS-backed storage
+
+![k3s](https://img.shields.io/badge/k3s-v1.34-FFC61C?logo=k3s&logoColor=black)
+![Helm](https://img.shields.io/badge/helm-deployed-0F1689?logo=helm&logoColor=white)
+![Proxmox](https://img.shields.io/badge/proxmox-9.1-E57000?logo=proxmox&logoColor=white)
+![Ansible](https://img.shields.io/badge/ansible-managed-EE0000?logo=ansible&logoColor=white)
+![Terraform](https://img.shields.io/badge/terraform-provisioned-7B42BC?logo=terraform&logoColor=white)
+
+**Status: Infrastructure Complete — Application Migration In Progress**
 
 > **Note:** This project was built with AI assistance. Every architecture decision, network design, tooling choice, and tradeoff in this repo is mine — I can speak to all of them.
+
+![Homelab Picture](docs/assets/homelab.png)
 
 ---
 
 ## Deployment & Operations
 
-### Fresh Deploy / Rebuild from Scratch
-See [docs/how-to-deploy.md](docs/how-to-deploy.md) for the full ordered guide covering NAS, WSL, Terraform, Ansible, and Tailscale setup.
+For a full ordered rebuild guide covering NAS, WSL, Proxmox, Terraform, Ansible, k3s, and platform stack deployment see [docs/how-to-deploy.md](docs/how-to-deploy.md).
 
 ---
 
 ## Infrastructure and Network
-<!-- Link to Hardware Section -->
-This lab is built on 3 ThinkCentres for the compute layer and a Synology NAS for storage. It is built on top of a Proxmox cluster to allow for HA of the management server, as well as enabling VM snapshots, backups, and management.
 
-[Hardware Specs](#hardware)
+Three ThinkCentre M710q Tiny nodes running Proxmox VE 9.1 form the compute layer. A Synology DS418 provides NFS-backed shared storage for VM disks and application data. All seven VMs are provisioned via Terraform using the bpg/proxmox provider and configured via Ansible.
 
-[Network Charts](#networks)
+[Hardware Specs](#hardware) | [Network Tables](#networks)
 
 ![Network Diagram](docs/assets/network.png)
 
-## Control Plane
-The Control Plane consists of 3 VMs operating as k3s control plane nodes. All management tooling (kubectl, helm, Terraform, Ansible, Flux) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path. It is designed to be fully HA, allowing any node to go down with no interruption to normal operations.
-
-![Control Plane Diagram](docs/assets/control.png)
 ---
+
+## Control Plane and Platform
+
+Three control plane VMs run k3s with embedded etcd and kube-vip providing a floating API VIP at `192.168.50.110`. Three worker VMs handle all workloads. All management tooling (kubectl, helm, Terraform, Ansible) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path.
+
+The platform layer runs on top of k3s:
+
+| Component | Role |
+|-----------|------|
+| MetalLB | Bare-metal load balancer, L2 mode, pool `.120–.129` |
+| Traefik | Ingress controller + reverse proxy, `192.168.50.120` |
+| cert-manager | Wildcard TLS via Let's Encrypt DNS-01 + Route53 |
+| NFS provisioner | Dynamic PV provisioning backed by Synology NAS |
+
+---
+
 ## Services
-Services are reverse proxied via Traefik running on each node, with a virtual IP address in front via MetalLB to handle HA failover. Traffic is routed using service names to cluster IP addresses, which are rewritten by k3s to service addresses to route to the correct pod. All application data is stored on the NAS via NFS mount points in the containers within the pods.
+
+Traefik reverse proxies all HTTPS traffic through `192.168.50.120`. AdGuard Home handles LAN DNS at `192.168.50.129` with custom rewrites pointing all `*.kds-dev.com` hostnames at the Traefik VIP. All application data is stored on the NAS via NFS mounts.
 
 ![Services Diagram](docs/assets/services.png)
----
-## Storage
-- Proxmox is installed on the physical nodes local storage and is the only thing that will be placed there.
-- VM's will be provisioned with 1 50GB disk that will be used to install the OS, required packages, and binaries. It will have a mount to the NAS for application data.
-- NAS has NFS exports for `/vm-disks`, where all VMDKs will be stored, and `/srv`, where subdirectories will be created for each application (e.g. `/srv/jellyfin/`).
-![Storage Diagram](docs/assets/storage.png)
----
 
+> *Diagram pending update to reflect current deployed state*
 
+### Deployed
 
-## Planned Services
+| Service | Subdomain | Purpose |
+|---------|-----------|---------|
+| AdGuard Home | adguard.kds-dev.com | DNS + ad blocking |
+| Vaultwarden | vaultwarden.kds-dev.com | Password manager |
+| Jellyfin | jellyfin.kds-dev.com | Media server |
 
-Infrastructure provisioning is complete. The next phase deploys workloads onto the k3s cluster using Helm charts and Kubernetes manifests managed from WSL.
+### Pending Migration from Standalone Host
 
 | Service | Purpose |
-|---|---|
-| Traefik | Ingress controller + reverse proxy |
-| MetalLB | Bare-metal load balancer |
-| Grafana / Prometheus | Cluster and node monitoring |
-| Jellyfin | Media server |
+|---------|---------|
 | Immich | Photo management |
-| Vaultwarden | Password manager (Bitwarden-compatible) |
 | Mealie | Recipe and meal planning |
+| Grafana / Prometheus | Monitoring — full redeploy, not migration |
 | FileBrowser | Web-based file management |
 | Homepage | Self-hosted dashboard |
 
 ---
 
-### Known Limitations
-1. Flat /24 network — current router does not support VLANs, so control 
-   plane, storage, and workload traffic share the same L2 segment
-2. NAS is a single point of failure for storage — mitigated by active/standby 
-   bonded NICs and RAID 5, but a NAS failure takes down both VM disks and 
-   application data
-3. Tailscale free tier limits devices — ts1 VM holds one of the three device
-   slots; Proxmox HA ensures it restarts on a surviving node if its host fails
+## Storage
 
-### Design Decisions
-
-1. **Dedicated Tailscale VM (ts1, .131)**
-   A dedicated VM runs the Tailscale daemon and advertises the LAN subnet 
-   (192.168.50.0/24) to the tailnet. This allows all remote devices to reach 
-   LAN hosts without installing Tailscale on each one. It runs as a VM under 
-   Proxmox HA rather than as a Kubernetes pod because it must survive cluster 
-   failure — if k3s is broken, ts1 is the recovery path. All management 
-   tooling (kubectl, helm, Terraform, Ansible, Flux) runs in the developer's 
-   WSL environment instead.
-
-2. **k3s on Proxmox VMs rather than bare metal**
-   Running k3s inside Proxmox VMs rather than directly on bare metal provides 
-   clean separation between the control plane and worker roles without 
-   requiring additional physical hardware. It also provides VM-level snapshots 
-   before risky changes, a recovery path when k3s itself is broken, and 
-   consistent OS images via cloud-init templating. Three dedicated control 
-   plane VMs maintain etcd quorum independently of the three worker VMs.
-
-3. **IP block segmentation as a VLAN substitute**
-   Without VLAN support on the current router, IP ranges within the /24 are 
-   segmented by infrastructure role. Each block reserves the .x0 address for 
-   virtual IPs, load balancers, or floating addresses, with .x1–.x3 
-   corresponding to which physical node a workload runs on. This makes the 
-   network self-documenting and provides a clear path to proper VLAN 
-   segmentation if router hardware is upgraded.
-
-4. **Control plane and worker VMs pinned to their respective hosts**
-   Pinning VMs to specific Proxmox nodes ensures one control plane and one 
-   worker are always present on each physical node. Without pinning, the 
-   Proxmox scheduler could place two control plane VMs on the same node — 
-   losing that node would drop two etcd members simultaneously, breaking 
-   quorum. Pinning guarantees the failure domain stays at one node regardless 
-   of cluster events.
-
-5. **k3s internal networks isolated from LAN**
-   k3s maintains two internal overlay networks that are intentionally 
-   invisible to the physical LAN. The pod network (10.42.0.0/16) is a flannel 
-   VXLAN overlay tunneled between worker VMs — pods get ephemeral IPs from 
-   this range that the LAN switch never sees. The service network 
-   (10.43.0.0/16) is not a real network at all — these IPs exist only as 
-   iptables rules maintained by kube-proxy on each worker and are never 
-   transmitted on the wire. All external access into the cluster is funneled 
-   exclusively through MetalLB service IPs in the .120–.129 range, keeping 
-   the boundary between cluster-internal and LAN-routable traffic explicit 
-   and controlled.
-6. **Pod / Cluster and Service CIDR Ranges**
-Pod and Service CIDRs use k3s defaults (10.42.0.0/16 and 10.43.0.0/16) 
-as neither conflicts with existing LAN or Tailscale address space.
-
-## Networks
-### IP Ranges — 192.168.50.0/24
-
-| Range     | Role                                                        |
-|-----------|-------------------------------------------------------------|
-| .1        | Default gateway                                             |
-| .2–.99    | DHCP clients                                                |
-| .100–.109 | Physical nodes (.101, .102, .103)                           |
-| .110–.119 | Control plane VMs (.110 VIP, .111–.113 VMs)                 |
-| .120–.129 | Worker / MetalLB pool (.120 Traefik, .121–.123 worker VMs)  |
-| .130–.139 | Infrastructure VMs (.131 ts1 — Tailscale subnet router)     |
-| .200–.209 | Storage (.201 Synology NAS)                                 |
-
-### k3s Internal Networks
-
-| Network        | Range          | Purpose                                                        |
-|----------------|----------------|----------------------------------------------------------------|
-| Pod CIDR       | 10.42.0.0/16   | Flannel VXLAN overlay — ephemeral pod IPs, not routable on LAN |
-| Service CIDR   | 10.43.0.0/16   | kube-proxy iptables rules — virtual only, never on wire        |
-| MetalLB pool   | .120–.129      | Only cluster IPs visible on LAN — single entry point           |
+Proxmox is installed on each node's local SSD. All VM disks are stored on the Synology NAS via NFS (`vm-disks` export) so any node can run any VM. Application data lives under the `srv` NFS export with a subdirectory per application. The NAS itself runs RAID 5 across four 4TB disks with active/standby bonded NICs.
 
 ---
 
-### Hardware
+## Design Decisions
 
-| Type    | Role      | Model                  | Notes                  |
-|---------|-----------|------------------------|------------------------|
-| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
-| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
-| Compute | k3s node  | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4   |
-| Storage | NAS       | Synology DS418         | 4x 4TB Disks, RAID 5   |
-| Network | L2 Switch | Netgear GS308          | 8 Port Unmanaged Switch|
-| Network | Router    | ASUS RT-AX82U          | Home Router            |
-| Network | Modem     | ISP Provided           | -                      |
+**Dedicated Tailscale VM (ts1)**
+Runs the Tailscale daemon and advertises `192.168.50.0/24` to the tailnet as a VM under Proxmox HA rather than a Kubernetes pod. If k3s is broken, ts1 is the recovery path — it cannot depend on the thing it recovers.
+
+**k3s on Proxmox VMs rather than bare metal**
+Running k3s inside VMs provides clean role separation without additional hardware, VM-level snapshots before risky changes, and consistent OS images via cloud-init templating. Three control plane VMs maintain etcd quorum independently of the three worker VMs.
+
+**Control plane and worker VMs pinned to their respective hosts**
+One control plane and one worker are always present on each physical node. Without pinning the Proxmox scheduler could place two control plane VMs on the same node — losing that node would drop two etcd members simultaneously and break quorum.
+
+**IP block segmentation as a VLAN substitute**
+Without VLAN support on the current router, IP ranges within the /24 are segmented by role. Each block reserves the .x0 address for virtual IPs or floating addresses, with .x1–.x3 corresponding to which physical node a workload runs on. This makes the network self-documenting and provides a clear path to VLAN segmentation if router hardware is upgraded.
+
+**k3s internal networks isolated from LAN**
+The pod network (10.42.0.0/16) is a flannel VXLAN overlay tunneled between worker VMs — pods get ephemeral IPs the LAN never sees. The service network (10.43.0.0/16) exists only as iptables rules maintained by kube-proxy and is never transmitted on the wire. All external access is funneled through MetalLB service IPs in the `.120–.129` range.
+
+---
+
+## Known Limitations
+
+1. **Flat /24 network** — current router does not support VLANs, so control plane, storage, and workload traffic share the same L2 segment
+2. **NAS is a single point of failure for storage** — mitigated by bonded NICs and RAID 5, but a NAS failure takes down both VM disks and application data
+3. **Tailscale free tier** — ts1 holds one of three device slots; Proxmox HA ensures it restarts on a surviving node if its host fails
+
+---
+
+## Networks
+
+### IP Ranges — 192.168.50.0/24
+
+| Range | Role |
+|-------|------|
+| .1 | Default gateway |
+| .2–.99 | DHCP clients |
+| .100–.109 | Physical nodes (.101, .102, .103) |
+| .110–.119 | Control plane VMs (.110 VIP, .111–.113 VMs) |
+| .120–.129 | MetalLB pool (.120 Traefik, .121–.123 worker VMs, .128 Jellyfin direct, .129 AdGuard DNS) |
+| .130–.139 | Infrastructure VMs (.131 ts1 — Tailscale subnet router) |
+| .200–.209 | Storage (.201 Synology NAS) |
+
+### k3s Internal Networks
+
+| Network | Range | Purpose |
+|---------|-------|---------|
+| Pod CIDR | 10.42.0.0/16 | Flannel VXLAN overlay — ephemeral pod IPs, not routable on LAN |
+| Service CIDR | 10.43.0.0/16 | kube-proxy iptables rules — virtual only, never on wire |
+| MetalLB pool | .120–.129 | Only cluster IPs visible on LAN — single entry point |
+
+---
+
+## Hardware
+
+| Type | Role | Model | Notes |
+|------|------|-------|-------|
+| Compute | k3s node | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4 |
+| Compute | k3s node | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4 |
+| Compute | k3s node | ThinkCentre M710q Tiny | Intel i5 / 16GB DDR4 |
+| Storage | NAS | Synology DS418 | 4x 4TB, RAID 5 |
+| Network | Switch | Netgear GS308 | 8-port unmanaged |
+| Network | Router | ASUS RT-AX82U | Home router |
+| Network | Modem | ISP provided | — |
