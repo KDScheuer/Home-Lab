@@ -57,21 +57,21 @@ Traefik reverse proxies all HTTPS traffic through `192.168.50.120`. AdGuard Home
 
 ### Deployed
 
-| Service | Subdomain | Purpose |
-|---------|-----------|---------|
-| AdGuard Home | adguard.kds-dev.com | DNS + ad blocking |
-| Vaultwarden | vaultwarden.kds-dev.com | Password manager |
-| Jellyfin | jellyfin.kds-dev.com | Media server |
+| Service      | Subdomain               | Purpose           |
+|--------------|-------------------------|-------------------|
+| AdGuard Home | adguard.kds-dev.com     | DNS + ad blocking |
+| Vaultwarden  | vaultwarden.kds-dev.com | Password manager  |
+| Jellyfin     | jellyfin.kds-dev.com    | Media server      |
+| Immich       | immich.kds-dev.com      | Photo management  |
 
 ### Pending Migration from Standalone Host
 
-| Service | Purpose |
-|---------|---------|
-| Immich | Photo management |
-| Mealie | Recipe and meal planning |
+| Service              | Purpose                                   |
+|----------------------|-------------------------------------------|
+| Mealie               | Recipe and meal planning                  |
 | Grafana / Prometheus | Monitoring — full redeploy, not migration |
-| FileBrowser | Web-based file management |
-| Homepage | Self-hosted dashboard |
+| FileBrowser          | Web-based file management                 |
+| Homepage             | Self-hosted dashboard                     |
 
 ---
 
