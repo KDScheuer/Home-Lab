@@ -29,3 +29,7 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# homepage icons & images
+/helm/apps/homepage/*.jpg
+/helm/apps/homepage/icons/*.png
