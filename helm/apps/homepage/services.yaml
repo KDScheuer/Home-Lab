@@ -6,7 +6,7 @@
         icon: adguard-home.png
 
     - Proxmox:
-        href: https://192.168.50.101:8006
+        href: https://proxmox.kds-dev.com
         description: Hypervisor management
         icon: proxmox.png
 
