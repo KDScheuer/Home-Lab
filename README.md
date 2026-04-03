@@ -65,6 +65,7 @@ Traefik reverse proxies all HTTPS traffic through `192.168.50.120`. AdGuard Home
 | Immich         | immich.kds-dev.com      | Photo management      |
 | Synology Drive | share.kds-dev.com       | Family file storage   |
 | Synology DSM   | nas.kds-dev.com         | NAS management portal |
+| Homepage       | home.kds-dev.com        | Self-hosted dashboard |
 
 ### Pending Migration from Standalone Host
 
@@ -72,7 +73,6 @@ Traefik reverse proxies all HTTPS traffic through `192.168.50.120`. AdGuard Home
 |----------------------|-------------------------------------------|
 | Mealie               | Recipe and meal planning                  |
 | Grafana / Prometheus | Monitoring — full redeploy, not migration |
-| Homepage             | Self-hosted dashboard                     |
 
 ---
 
