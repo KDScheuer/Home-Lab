@@ -10,8 +10,6 @@
 
 **Status: Infrastructure Complete — Application Migration In Progress**
 
-> **Note:** This project was built with AI assistance. Every architecture decision, network design, tooling choice, and tradeoff in this repo is mine — I can speak to all of them.
-
 ![Homelab Picture](docs/assets/homelab.png)
 
 ---
