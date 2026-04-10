@@ -32,14 +32,14 @@ Three ThinkCentre M710q Tiny nodes running Proxmox VE 9.1 form the compute layer
 
 ## Control Plane and Platform
 
-Three control plane VMs run k3s with embedded etcd and kube-vip providing a floating API VIP at `192.168.50.110`. Three worker VMs handle all workloads. All management tooling (kubectl, helm, Terraform, Ansible) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path.
+Three control plane VMs run k3s with embedded etcd and kube-vip providing a floating API VIP at `192.168.0.110`. Three worker VMs handle all workloads. All management tooling (kubectl, helm, Terraform, Ansible) runs in the developer's WSL environment. A dedicated Tailscale VM (`ts1`) provides persistent remote access to the LAN and survives cluster failure, preserving the recovery path.
 
 The platform layer runs on top of k3s:
 
 | Component | Role |
 |-----------|------|
 | MetalLB | Bare-metal load balancer, L2 mode, pool `.120–.129` |
-| Traefik | Ingress controller + reverse proxy, `192.168.50.120` |
+| Traefik | Ingress controller + reverse proxy, `192.168.0.120` |
 | cert-manager | Wildcard TLS via Let's Encrypt DNS-01 + Route53 |
 | NFS provisioner | Dynamic PV provisioning backed by Synology NAS |
 
@@ -47,7 +47,7 @@ The platform layer runs on top of k3s:
 
 ## Services
 
-Traefik reverse proxies all HTTPS traffic through `192.168.50.120`. AdGuard Home handles LAN DNS at `192.168.50.129` with custom rewrites pointing all `*.kds-dev.com` hostnames at the Traefik VIP. All application data is stored on the NAS via NFS mounts.
+Traefik reverse proxies all HTTPS traffic through `192.168.0.120`. AdGuard Home handles LAN DNS at `192.168.0.129` with custom rewrites pointing all `*.kds-dev.com` hostnames at the Traefik VIP. All application data is stored on the NAS via NFS mounts.
 
 ![Services Diagram](docs/assets/services.png)
 
@@ -82,7 +82,7 @@ Proxmox is installed on each node's local SSD. All VM disks are stored on the Sy
 ## Design Decisions
 
 **Dedicated Tailscale VM (ts1)**
-Runs the Tailscale daemon and advertises `192.168.50.0/24` to the tailnet as a VM under Proxmox HA rather than a Kubernetes pod. If k3s is broken, ts1 is the recovery path — it cannot depend on the thing it recovers.
+Runs the Tailscale daemon and advertises `192.168.0.0/21` to the tailnet as a VM under Proxmox HA rather than a Kubernetes pod. If k3s is broken, ts1 is the recovery path — it cannot depend on the thing it recovers.
 
 **k3s on Proxmox VMs rather than bare metal**
 Running k3s inside VMs provides clean role separation without additional hardware, VM-level snapshots before risky changes, and consistent OS images via cloud-init templating. Three control plane VMs maintain etcd quorum independently of the three worker VMs.
@@ -108,7 +108,7 @@ The pod network (10.42.0.0/16) is a flannel VXLAN overlay tunneled between worke
 
 ## Networks
 
-### IP Ranges — 192.168.50.0/24
+### IP Ranges — 192.168.0.0/21
 
 | Range | Role |
 |-------|------|

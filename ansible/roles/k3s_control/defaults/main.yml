@@ -28,9 +28,9 @@ k3s_api_vip: "{{ kubevip_vip }}"
 # Override in group_vars/k3s_control.yml with your real IPs.
 k3s_tls_sans:
   - "{{ k3s_api_vip }}"
-  - "192.168.50.111"
-  - "192.168.50.112"
-  - "192.168.50.113"
+  - "192.168.0.111"
+  - "192.168.0.112"
+  - "192.168.0.113"
 
 # ── Cluster options ───────────────────────────────────────────────────────────
 # Bundled components to disable — replaced by Helm/Flux-managed releases

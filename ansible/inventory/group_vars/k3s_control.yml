@@ -4,7 +4,7 @@
 
 # ── kube-vip ──────────────────────────────────────────────────────────────────
 # Overrides of kube_vip role defaults for this environment.
-kubevip_vip: "192.168.50.110"
+kubevip_vip: "192.168.0.110"
 kubevip_interface: "eth0"
 
 # ── k3s direct install ────────────────────────────────────────────────────────
@@ -14,10 +14,10 @@ kubevip_interface: "eth0"
 # TLS SANs — VIP + all control plane IPs so the cert is valid regardless of
 # which node kubectl connects to.  Must be updated if IPs change.
 k3s_tls_sans:
-  - "192.168.50.110"   # kube-vip VIP  (also defaults via k3s_api_vip)
-  - "192.168.50.111"   # ctrl1
-  - "192.168.50.112"   # ctrl2
-  - "192.168.50.113"   # ctrl3
+  - "192.168.0.110"   # kube-vip VIP  (also defaults via k3s_api_vip)
+  - "192.168.0.111"   # ctrl1
+  - "192.168.0.112"   # ctrl2
+  - "192.168.0.113"   # ctrl3
 
 # Bundled components to disable — replaced by Flux-managed Helm releases.
 k3s_disable:

@@ -6,7 +6,7 @@ kubevip_version: "v0.8.7"
 kubevip_image: "ghcr.io/kube-vip/kube-vip:{{ kubevip_version }}"
 
 # Network defaults — typically overridden in group_vars/k3s_control.yml
-kubevip_vip: "192.168.50.110"
+kubevip_vip: "192.168.0.110"
 kubevip_interface: "eth0"
 
 # k3s places auto-deployed manifests here (picked up on k3s start)

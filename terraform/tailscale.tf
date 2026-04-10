@@ -47,7 +47,7 @@ resource "proxmox_virtual_environment_vm" "ts1" {
 
     ip_config {
       ipv4 {
-        address = "192.168.50.131/24"
+        address = "192.168.0.131/24"
         gateway = var.network_gateway
       }
     }

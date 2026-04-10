@@ -1,6 +1,6 @@
 ---
 # NAS connection details
-nas_host: "192.168.50.201"
+nas_host: "192.168.0.201"
 nas_export_base: "/volume1/networkShare"
 
 # NFS storages to configure in Proxmox

@@ -16,6 +16,7 @@ helm repo add metallb https://metallb.github.io/metallb
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo add cert-manager https://charts.jetstack.io
 helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 ```
 
@@ -68,10 +69,10 @@ source ~/.bashrc
 mkdir -p ~/.kube
 
 # Copy kubeconfig from ctrl1
-scp -i ~/.ssh/ansible ansible@192.168.50.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+scp -i ~/.ssh/ansible ansible@192.168.0.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
 
 # Point it at the kube-vip VIP instead of localhost
-sed -i 's/127.0.0.1/192.168.50.110/g' ~/.kube/config
+sed -i 's/127.0.0.1/192.168.0.110/g' ~/.kube/config
 
 # Lock down permissions
 chmod 600 ~/.kube/config

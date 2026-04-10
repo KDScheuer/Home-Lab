@@ -5,7 +5,7 @@ metadata:
   namespace: jellyfin
   annotations:
     metallb.universe.tf/address-pool: homelab-pool
-    metallb.universe.tf/loadBalancerIPs: 192.168.50.128
+    metallb.universe.tf/loadBalancerIPs: 192.168.0.128
 spec:
   type: LoadBalancer
   selector:

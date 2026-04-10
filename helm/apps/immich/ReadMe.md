@@ -104,7 +104,7 @@ immich-server             1/1   Running
 
 ## Verify
 
-Add DNS rewrite in AdGuard: `immich.kds-dev.com → 192.168.50.120`
+Add DNS rewrite in AdGuard: `immich.kds-dev.com → 192.168.0.120`
 
 ```bash
 curl -I https://immich.kds-dev.com

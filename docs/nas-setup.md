@@ -5,7 +5,7 @@
 | Property | Value              |
 |----------|--------------------|
 | Hostname | `nas.kds-dev.com`  |
-| IP       | `192.168.50.201`   |
+| IP       | `192.168.0.201`   |
 
 ---
 
@@ -25,7 +25,7 @@
 |-----------------|-------------------------|
 | Export path     | `/volume1/networkShare` |
 | NFS version     | NFSv3                   |
-| Allowed network | `192.168.50.0/24`       |
+| Allowed network | `192.168.0.0/21`       |
 | Permissions     | Read/Write              |
 | User squash     | Map all users to admin  |
 

@@ -45,9 +45,9 @@ Applied manifests:
 kubectl apply -f ./
 ```
 
-Added DNS rewrite in AdGuard: `jellyfin.kds-dev.com → 192.168.50.120`
+Added DNS rewrite in AdGuard: `jellyfin.kds-dev.com → 192.168.0.120`
 
-Updated LG TV to point directly at `192.168.50.128:8096` — TV does not work
+Updated LG TV to point directly at `192.168.0.128:8096` — TV does not work
 through Traefik reverse proxy, requires direct port access.
 
 ---
@@ -57,9 +57,9 @@ through Traefik reverse proxy, requires direct port access.
 - Config, cache, and media all mount directly from NAS via static PVs
 - No provisioner-generated directories — data paths are fixed and predictable
 - Two services: `jellyfin-web` (ClusterIP, Traefik) and `jellyfin-direct`
-  (LoadBalancer at 192.168.50.128, LG TV)
+  (LoadBalancer at 192.168.0.128, LG TV)
 - Browser access via `https://jellyfin.kds-dev.com` through Traefik
-- TV access via `192.168.50.128:8096` direct — update TV network settings if
+- TV access via `192.168.0.128:8096` direct — update TV network settings if
   this IP changes
 - Single replica only, Recreate strategy
 - Old homelab01 container remains stopped

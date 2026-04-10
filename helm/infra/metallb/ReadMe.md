@@ -61,7 +61,7 @@ kubectl -n metallb-system get pods
 
 ## Notes
 
-- IP pool: `192.168.50.120-192.168.50.129`, L2 mode
+- IP pool: `192.168.0.120-192.168.0.129`, L2 mode
 - Assigned IPs: `.120` Traefik, `.128` Jellyfin direct, `.129` AdGuard DNS
 - 6 speaker pods — one per node (3 control plane + 3 workers) — this is correct
 - The webhook 502 issue is caused by the API server being unable to reach webhook

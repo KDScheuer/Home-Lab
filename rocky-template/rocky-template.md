@@ -27,7 +27,7 @@ section regarding Packer as the production alternative.
 ### 1. SSH into node1 and switch to root
 
 ```bash
-ssh ansible@192.168.50.101
+ssh ansible@192.168.0.101
 sudo su
 cd /tmp
 ```

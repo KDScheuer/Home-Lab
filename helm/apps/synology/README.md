@@ -23,8 +23,8 @@ kubectl apply -f nas-ingress.yml
 
 Add DNS rewrites in AdGuard:
 ```
-nas.kds-dev.com   → 192.168.50.120
-share.kds-dev.com → 192.168.50.120
+nas.kds-dev.com   → 192.168.0.120
+share.kds-dev.com → 192.168.0.120
 ```
 
 Verify:
@@ -95,7 +95,7 @@ homes         → /volume1/homes
 
 Connection settings in DS File:
 ```
-Server:  192.168.50.201
+Server:  192.168.0.201
 Port:    5001
 HTTPS:   ON
 ```
@@ -130,7 +130,7 @@ metadata:
   namespace: default
 subsets:
   - addresses:
-      - ip: 192.168.50.201
+      - ip: 192.168.0.201
     ports:
       - port: 5001
 ```

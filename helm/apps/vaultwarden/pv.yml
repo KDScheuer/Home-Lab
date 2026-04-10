@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jellyfin-media
+  name: vaultwarden-data
 spec:
   capacity:
-    storage: 3Ti
+    storage: 5Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
   nfs:
     server: 192.168.0.201
-    path: /volume1/networkShare/srv/jellyfin/media
+    path: /volume1/networkShare/srv/vaultwarden

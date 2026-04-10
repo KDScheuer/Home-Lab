@@ -11,10 +11,10 @@ Run this once after `site.yml` completes. Only needs to be repeated if `ts1` is 
 SSH into `ts1` and bring Tailscale up with subnet routing:
 
 ```bash
-ssh ansible@192.168.50.131
+ssh ansible@192.168.0.131
 
 sudo tailscale up \
-  --advertise-routes=192.168.50.0/24 \
+  --advertise-routes=192.168.0.0/21 \
   --accept-routes
 ```
 
@@ -27,7 +27,7 @@ This outputs a URL — open it in a browser and authenticate with your Tailscale
 Go to [login.tailscale.com/admin/machines](https://login.tailscale.com/admin/machines):
 
 1. Approve `ts1` — it will show as pending
-2. Click into `ts1` → under **Subnets** approve `192.168.50.0/24`
+2. Click into `ts1` → under **Subnets** approve `192.168.0.0/21`
 
 ---
 
@@ -36,10 +36,10 @@ Go to [login.tailscale.com/admin/machines](https://login.tailscale.com/admin/mac
 From a Tailscale-connected device off the LAN, confirm the subnet route is working:
 
 ```bash
-ping 192.168.50.101
+ping 192.168.0.101
 ```
 
-Or open the Proxmox UI at `https://192.168.50.101:8006`.
+Or open the Proxmox UI at `https://192.168.0.101:8006`.
 
 ---
 
@@ -48,8 +48,8 @@ Or open the Proxmox UI at `https://192.168.50.101:8006`.
 Tailscale should reconnect automatically — no re-join or admin approval needed. If it doesn't:
 
 ```bash
-ssh ansible@192.168.50.131
-sudo tailscale up --advertise-routes=192.168.50.0/24 --accept-routes
+ssh ansible@192.168.0.131
+sudo tailscale up --advertise-routes=192.168.0.0/21 --accept-routes
 ```
 
 ---

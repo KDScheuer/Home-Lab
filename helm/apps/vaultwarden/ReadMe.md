@@ -71,7 +71,7 @@ Scaled back up:
 kubectl -n vaultwarden scale deployment vaultwarden --replicas=1
 ```
 
-Added DNS rewrite in AdGuard: `vaultwarden.kds-dev.com → 192.168.50.120`
+Added DNS rewrite in AdGuard: `vaultwarden.kds-dev.com → 192.168.0.120`
 
 Verified:
 
@@ -86,7 +86,7 @@ Logged in via browser — all passwords present.
 
 ## Notes
 
-- Data lives at `/volume1/networkShare/srv/` in the provisioner-generated directory
+- Data lives at `/volume1/networkShare/srv/vaultwarden` — static NFS PV, not provisioner-managed
 - Secret is not in Git — recreate from `.env` on homelab01 if cluster is rebuilt
 - IngressRoute uses `tls: {}` to pick up the default wildcard cert from Traefik
 - Single replica only — SQLite on NFS is not safe with multiple writers

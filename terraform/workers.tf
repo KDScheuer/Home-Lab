@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "work1" {
 
     ip_config {
       ipv4 {
-        address = "192.168.50.121/24"
+        address = "192.168.0.121/24"
         gateway = var.network_gateway
       }
     }
@@ -124,7 +124,7 @@ resource "proxmox_virtual_environment_vm" "work2" {
 
     ip_config {
       ipv4 {
-        address = "192.168.50.122/24"
+        address = "192.168.0.122/24"
         gateway = var.network_gateway
       }
     }
@@ -199,7 +199,7 @@ resource "proxmox_virtual_environment_vm" "work3" {
 
     ip_config {
       ipv4 {
-        address = "192.168.50.123/24"
+        address = "192.168.0.123/24"
         gateway = var.network_gateway
       }
     }

@@ -30,7 +30,7 @@ State is stored locally in `terraform.tfstate` (gitignored).
 | `ssh_public_key` | SSH public key injected into VMs via cloud-init | — (required) |
 | `ssh_private_key_path` | Private key for Proxmox SSH operations | `~/.ssh/id_ed25519` |
 | `proxmox_node_map` | VM name → Proxmox node pinning | See below |
-| `network_gateway` | Default gateway for all VMs | `192.168.50.1` |
+| `network_gateway` | Default gateway for all VMs | `192.168.0.1` |
 | `network_dns` | DNS servers for all VMs | `["1.1.1.1", "8.8.8.8"]` |
 | `network_domain` | Domain name for all VMs | `kds-dev.com` |
 | `template_id` | Source template VM ID | `9000` |
@@ -41,13 +41,13 @@ State is stored locally in `terraform.tfstate` (gitignored).
 
 | VM | Node | IP | Role |
 |----|------|----|------|
-| ts1 | node1 | 192.168.50.131 | Tailscale subnet router (Proxmox HA enabled) |
-| ctrl1 | node1 | 192.168.50.111 | k3s control plane |
-| ctrl2 | node2 | 192.168.50.112 | k3s control plane |
-| ctrl3 | node3 | 192.168.50.113 | k3s control plane |
-| work1 | node1 | 192.168.50.121 | k3s worker |
-| work2 | node2 | 192.168.50.122 | k3s worker |
-| work3 | node3 | 192.168.50.123 | k3s worker |
+| ts1 | node1 | 192.168.0.131 | Tailscale subnet router (Proxmox HA enabled) |
+| ctrl1 | node1 | 192.168.0.111 | k3s control plane |
+| ctrl2 | node2 | 192.168.0.112 | k3s control plane |
+| ctrl3 | node3 | 192.168.0.113 | k3s control plane |
+| work1 | node1 | 192.168.0.121 | k3s worker |
+| work2 | node2 | 192.168.0.122 | k3s worker |
+| work3 | node3 | 192.168.0.123 | k3s worker |
 
 Each VM ID matches the last octet of its IP address (e.g., ctrl1 → VM ID 111).
 
@@ -60,7 +60,7 @@ Each VM ID matches the last octet of its IP address (e.g., ctrl1 → VM ID 111).
 Create `terraform.tfvars` (gitignored, never committed):
 
 ```hcl
-proxmox_endpoint  = "https://192.168.50.101:8006"
+proxmox_endpoint  = "https://192.168.0.101:8006"
 proxmox_api_token = "root@pam!terraform=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ssh_public_key    = "ssh-ed25519 AAAA...your-key"
 ```

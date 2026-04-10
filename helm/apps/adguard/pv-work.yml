@@ -9,5 +9,5 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   nfs:
-    server: 192.168.50.201
+    server: 192.168.0.201
     path: /volume1/networkShare/srv/adguardhome/work

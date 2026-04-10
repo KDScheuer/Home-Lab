@@ -6,7 +6,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: nfs
+  storageClassName: ""
+  volumeName: vaultwarden-data
   resources:
     requests:
       storage: 5Gi

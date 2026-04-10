@@ -103,8 +103,8 @@ Copy the kubeconfig from `ctrl1` and point it at the kube-vip VIP so it remains 
 
 ```bash
 mkdir -p ~/.kube
-scp -i ~/.ssh/ansible ansible@192.168.50.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
-sed -i 's/127.0.0.1/192.168.50.110/g' ~/.kube/config
+scp -i ~/.ssh/ansible ansible@192.168.0.111:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+sed -i 's/127.0.0.1/192.168.0.110/g' ~/.kube/config
 chmod 600 ~/.kube/config
 kubectl get nodes
 ```

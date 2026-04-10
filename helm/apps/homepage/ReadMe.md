@@ -24,7 +24,7 @@ Watch pod come up:
 kubectl -n homepage get pods -w
 ```
 
-Add DNS rewrite in AdGuard: `home.kds-dev.com → 192.168.50.120`
+Add DNS rewrite in AdGuard: `home.kds-dev.com → 192.168.0.120`
 
 ---
 

@@ -37,7 +37,7 @@ variable "proxmox_node_map" {
 variable "network_gateway" {
   description = "Default gateway for all VMs"
   type        = string
-  default     = "192.168.50.1"
+  default     = "192.168.0.1"
 }
 
 variable "network_dns" {

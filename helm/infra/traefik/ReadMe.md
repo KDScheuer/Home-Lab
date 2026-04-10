@@ -41,7 +41,7 @@ Watch pods come up:
 kubectl -n traefik get pods -w
 ```
 
-Verify MetalLB assigned `192.168.50.120`:
+Verify MetalLB assigned `192.168.0.120`:
 
 ```bash
 kubectl -n traefik get svc
@@ -61,20 +61,20 @@ helm upgrade traefik traefik/traefik \
 Verify TLS is working — look for `HTTP/2`:
 
 ```bash
-curl -I https://192.168.50.120 --insecure
+curl -I https://192.168.0.120 --insecure
 ```
 
 Verify HTTP redirect is working — look for `308 Permanent Redirect`:
 
 ```bash
-curl -I http://192.168.50.120
+curl -I http://192.168.0.120
 ```
 
 ---
 
 ## Notes
 
-- MetalLB IP: `192.168.50.120` — all `*.kds-dev.com` DNS rewrites point here
+- MetalLB IP: `192.168.0.120` — all `*.kds-dev.com` DNS rewrites point here
 - 3 replicas, LoadBalancer type, annotated to use `homelab-pool`
 - IngressRoutes in app namespaces use `tls: {}` — picks up default wildcard
   cert from TLS store automatically, no per-app secret reference needed

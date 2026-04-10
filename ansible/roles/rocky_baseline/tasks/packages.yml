@@ -5,6 +5,7 @@
     name: "*"
     state: latest
     update_cache: true
+  ignore_errors: true
 
 - name: Install baseline packages
   ansible.builtin.dnf:

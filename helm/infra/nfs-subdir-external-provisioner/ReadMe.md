@@ -9,7 +9,7 @@ helm install nfs-subdir-external-provisioner \
   nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
   --namespace nfs-provisioner \
   --create-namespace \
-  --set nfs.server=192.168.50.201 \
+  --set nfs.server=192.168.0.201 \
   --set nfs.path=/volume1/networkShare/srv \
   --set storageClass.name=nfs \
   --set storageClass.defaultClass=true \
@@ -75,7 +75,7 @@ working correctly. Delete it manually from DSM if not needed.
 
 ## Notes
 
-- NFS path: `/volume1/networkShare/srv` on `192.168.50.201`
+- NFS path: `/volume1/networkShare/srv` on `192.168.0.201`
 - Reclaim policy is `Retain` — deleting a PVC never deletes data on the NAS
 - Provisioner auto-creates subdirectories per PVC with generated names
 - For apps with existing data use static PVs pointing at the existing path

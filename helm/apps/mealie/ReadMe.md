@@ -29,7 +29,7 @@ database is restored:
 kubectl apply -f pv.yml
 kubectl apply -f pvc.yml
 kubectl apply -f deployment-postgres.yml
-kubectl apply -f services-ingress.yml
+kubectl apply -f ingress.yml
 ```
 
 Wait for Postgres to be Running:
@@ -76,7 +76,7 @@ kubectl -n mealie get pods -w
 
 ## Verify
 
-Add DNS rewrite in AdGuard: `mealie.kds-dev.com → 192.168.50.120`
+Add DNS rewrite in AdGuard: `mealie.kds-dev.com → 192.168.0.120`
 
 ```bash
 curl -I https://mealie.kds-dev.com
