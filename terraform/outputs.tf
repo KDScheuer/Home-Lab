@@ -7,6 +7,7 @@ output "vm_summary" {
   description = "Summary of all deployed VMs"
   value = {
     ts1     = "ts1.kds-dev.com  → 192.168.0.131 (node1, HA enabled, Tailscale subnet router)"
+    ops1    = "ops1.kds-dev.com  → 192.168.0.132 (node2, HA enabled, Operations VM)"
     ctrl01  = "ctrl01.kds-dev.com  → 192.168.0.111 (node1, pinned)"
     ctrl02  = "ctrl02.kds-dev.com  → 192.168.0.112 (node2, pinned)"
     ctrl03  = "ctrl03.kds-dev.com  → 192.168.0.113 (node3, pinned)"

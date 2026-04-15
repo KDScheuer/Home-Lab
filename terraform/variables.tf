@@ -25,6 +25,7 @@ variable "proxmox_node_map" {
   type        = map(string)
   default = {
     ts1    = "node1"
+    ops1   = "node2"
     ctrl1  = "node1"
     ctrl2  = "node2"
     ctrl3  = "node3"
