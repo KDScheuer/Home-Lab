@@ -36,19 +36,17 @@
 
 Clients are directed to MetalLB via DNS provided by the router during DHCP. MetalLB has 3 VIP's assigned, .120 for application traffic using 443 or 80, .129 for DNS traffic using 53, and 128 for jellyfin traffic on port 8096 (required as our tv does not like being reverse proxied). Traefik is in place to reverse proxy to the service IP's as well as provide TLS termination. 
 
-![Services Diagram](docs/assets/services.png)
-
-### Deployed
-
 | Service        | Subdomain               | Purpose                  |
 |----------------|-------------------------|--------------------------|
 | AdGuard Home   | adguard.kds-dev.com     | DNS + ad blocking        |
 | Vaultwarden    | vaultwarden.kds-dev.com | Password manager         |
 | Jellyfin       | jellyfin.kds-dev.com    | Media server             |
 | Immich         | immich.kds-dev.com      | Photo management         |
-| Synology Drive | share.kds-dev.com       | Family file storage      |
+| Synology Drive | drive.kds-dev.com       | Family file storage      |
 | Homepage       | home.kds-dev.com        | Self-hosted dashboard    |
 | Mealie         | mealie.kds-dev.com      | Recipe and meal planning |
+
+![Services Diagram](docs/assets/services.png)
 
 ---
 
